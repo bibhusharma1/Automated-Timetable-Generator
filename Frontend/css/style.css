@@ -35,6 +35,17 @@ body {
     line-height: 1.6;
     min-height: 100vh;
 }
+/*TYPOGRAPHY STYLING*/
+h1 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--primary-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+p {
+    color: var(--text-secondary);
+}
 /*LOGIN PAGE specific*/
 .login-wrapper {
     min-height: 100vh;
@@ -52,4 +63,27 @@ body {
 .login-header {
     text-align: center;
     margin-bottom: var(--spacing-lg);
+}
+
+/*LOGO AND TITLE STYLING*/
+.login-logo {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--spacing-md);
+    font-size: 2.5rem;
+    color: white;
+}
+
+.login-title {
+    margin-bottom: 0.5rem;
+}
+
+.login-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
 }
