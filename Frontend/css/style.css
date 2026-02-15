@@ -1,0 +1,24 @@
+:root {
+    --primary-color: #1a4d2e;
+    --primary-dark: #0f2818;
+    --secondary-color: #4f772d;
+
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-primary: #2d3436;
+    --text-secondary: #636e72;
+    --border-color: #dfe6e9;
+
+    --font-display: 'Crimson Text', Georgia, serif;
+    --font-body: 'Source Sans Pro', 'Segoe UI', sans-serif;
+
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+}
