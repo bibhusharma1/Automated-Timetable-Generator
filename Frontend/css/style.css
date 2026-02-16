@@ -4,7 +4,7 @@
     --secondary-color: #4f772d;
 
     --bg-color: #f8f9fa;
-    --card-bg: #ffffff;
+    --card-bg: #d2e1b7;
     --text-primary: #2d3436;
     --text-secondary: #636e72;
     --border-color: #dfe6e9;
@@ -30,7 +30,7 @@
 
 body {
     font-family: var(--font-body);
-    background-color: var(--bg-color);
+    background: linear-gradient(15deg, #9ec5cd, #0e8545);
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;
@@ -56,14 +56,24 @@ p {
 }
 
 .login-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1000px;
     width: 100%;
-    max-width: 450px;
+    gap: 4rem;
 }
 
+
 .login-header {
-    text-align: center;
-    margin-bottom: var(--spacing-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+
 
 /*LOGO AND TITLE STYLING*/
 .login-logo {
