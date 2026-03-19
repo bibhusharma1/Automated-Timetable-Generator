@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Teacher Preferences - Automated Timetable Generator">
+    <title>Teacher Preferences - Automated Timetable Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div>
+                        <h1 class="header-title">Teacher Preferences</h1>
+                        <p class="header-subtitle">Add teacher scheduling preferences for timetable generation</p>
+                    </div>
+                    <button class="nav-back">← Back to Dashboard</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <div class="form-container">
+                    <div id="alertContainer"></div>
+
+                    <div class="form-card">
+                        <h2 class="form-title">Add Teacher Preferences</h2>
+                        <p class="text-center text-muted mb-2">
+                            Enter teacher information and scheduling preferences to optimize timetable generation
+                        </p>
+
+                        <form id="teacherForm">
+                            <!-- Teacher Name -->
+                            <div class="form-group">
+                                <label for="teacherName" class="form-label">Teacher Name *</label>
+                                <input 
+                                    type="text" 
+                                    id="teacherName" 
+                                    class="form-input" 
+                                    placeholder="Enter full name"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Teacher ID -->
+                            <div class="form-group">
+                                <label for="teacherId" class="form-label">Teacher ID</label>
+                                <input 
+                                    type="text" 
+                                    id="teacherId" 
+                                    class="form-input" 
+                                    placeholder="Enter teacher ID (optional)"
+                                >
+                                <small class="form-help">Leave blank to auto-generate</small>
+                            </div>
+
+                            <!-- Academic Level -->
+                            <div class="form-group">
+                                <label for="academicLevel" class="form-label">Academic Level *</label>
+                                <select id="academicLevel" class="form-select" required>
+                                    <option value="">Select academic level</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                </select>
+                            </div>
+
+                            <!-- Subject Name -->
+                            <div class="form-group">
+                                <label for="subjectName" class="form-label">Subject Name *</label>
+                                <input 
+                                    type="text" 
+                                    id="subjectName" 
+                                    class="form-input" 
+                                    placeholder="Enter subject name"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Preferred Time Slot -->
+                            <div class="form-group">
+                                <label for="timeSlot" class="form-label">Preferred Time Slot *</label>
+                                <select id="timeSlot" class="form-select" required>
+                                    <option value="">Select preferred time slot</option>
+                                    <option value="Morning">Morning (8:00 AM - 11:00 AM)</option>
+                                    <option value="Mid">Mid (11:00 AM - 2:00 PM)</option>
+                                    <option value="Last">Last (2:00 PM - 5:00 PM)</option>
+                                </select>
+                            </div>
+
+                            <!-- Preferred Days -->
+                            <div class="form-group">
+                                <label class="form-label">Preferred Days *</label>
+                                <div class="form-checkbox-group">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="preferredDays" value="Monday">
+                                        <span>Monday</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="preferredDays" value="Tuesday">
+                                        <span>Tuesday</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="preferredDays" value="Wednesday">
+                                        <span>Wednesday</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="preferredDays" value="Thursday">
+                                        <span>Thursday</span>
+                                    </label>
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="preferredDays" value="Friday">
+                                        <span>Friday</span>
+                                    </label>
+                                </div>
+                                <small class="form-help">Select at least one preferred day</small>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="form-group" style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                <button type="submit" class="btn btn-primary" style="flex: 1;">
+                                    Save Preferences
+                                </button>
+                                <button type="button" id="resetForm" class="btn btn-secondary">
+                                    Clear Form
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card mt-2">
+                        <h3 class="card-title">About Teacher Preferences</h3>
+                        <p class="card-description">
+                            Teacher preferences are used by the machine learning algorithm to generate optimized timetables. 
+                            The system considers preferred time slots and days to minimize conflicts and maximize teacher satisfaction. 
+                            This data will be integrated with attendance patterns for intelligent scheduling.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
