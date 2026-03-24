@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Attendance Data - Automated Timetable Generator">
+    <title>Attendance Data - Automated Timetable Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div>
+                        <h1 class="header-title">Attendance Data</h1>
+                        <p class="header-subtitle">Record attendance patterns for optimal scheduling</p>
+                    </div>
+                    <button class="nav-back">← Back to Dashboard</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <div class="form-container">
+                    <div id="alertContainer"></div>
+
+                    <div class="form-card">
+                        <h2 class="form-title">Add Attendance Data</h2>
+                        <p class="text-center text-muted mb-2">
+                            Enter attendance trends to help optimize class scheduling based on student participation
+                        </p>
+
+                        <form id="attendanceForm">
+                            <!-- Academic Level -->
+                            <div class="form-group">
+                                <label for="attendanceLevel" class="form-label">Academic Level *</label>
+                                <select id="attendanceLevel" class="form-select" required>
+                                    <option value="">Select academic level</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                </select>
+                            </div>
+
+                            <!-- Subject Name -->
+                            <div class="form-group">
+                                <label for="attendanceSubject" class="form-label">Subject Name *</label>
+                                <input 
+                                    type="text" 
+                                    id="attendanceSubject" 
+                                    class="form-input" 
+                                    placeholder="Enter subject name"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Time Slot -->
+                            <div class="form-group">
+                                <label for="attendanceTimeSlot" class="form-label">Time Slot *</label>
+                                <select id="attendanceTimeSlot" class="form-select" required>
+                                    <option value="">Select time slot</option>
+                                    <option value="Morning">Morning (8:00 AM - 11:00 AM)</option>
+                                    <option value="Mid">Mid (11:00 AM - 2:00 PM)</option>
+                                    <option value="Last">Last (2:00 PM - 5:00 PM)</option>
+                                </select>
+                            </div>
+
+                            <!-- Attendance Percentage -->
+                            <div class="form-group">
+                                <label for="attendancePercentage" class="form-label">Average Attendance Percentage *</label>
+                                <input 
+                                    type="number" 
+                                    id="attendancePercentage" 
+                                    class="form-input" 
+                                    placeholder="Enter percentage (0-100)"
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    required
+                                >
+                                <small class="form-help">Enter the average attendance percentage for this subject and time slot</small>
+                            </div>
+
+                            <!-- Visual Indicator -->
+                            <div class="card" style="background: rgba(26, 77, 46, 0.05); border: none; padding: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Low Attendance</span>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">High Attendance</span>
+                                </div>
+                                <div style="height: 8px; background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60); border-radius: 4px;"></div>
+                                <p style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0;">
+                                    Higher attendance percentages indicate better engagement during those time slots
+                                </p>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group" style="margin-top: 2rem;">
+                                <button type="submit" class="btn btn-primary btn-large">
+                                    Save Attendance Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card mt-2">
+                        <h3 class="card-title">How Attendance Data is Used</h3>
+                        <p class="card-description">
+                            Attendance data helps the system identify optimal time slots for different subjects. 
+                            The machine learning algorithm uses this information to:
+                        </p>
+                        <ul style="color: var(--text-secondary); line-height: 1.8; margin-left: 1.5rem;">
+                            <li>Schedule popular subjects during high-attendance time slots</li>
+                            <li>Identify patterns in student engagement across different times of day</li>
+                            <li>Optimize classroom utilization based on expected attendance</li>
+                            <li>Balance the timetable to maximize overall student participation</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
