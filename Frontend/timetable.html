@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View Timetable - Automated Timetable Generator">
+    <title>View Timetable - Automated Timetable Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+    <style>
+        @media print {
+            .header, .nav-back, .action-bar {
+                display: none;
+            }
+            .main-content {
+                padding: 1rem 0;
+            }
+            .table-container {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div>
+                        <h1 class="header-title">View Timetable</h1>
+                        <p class="header-subtitle">Generated timetable for <span id="currentLevel">All Levels</span></p>
+                    </div>
+                    <button class="nav-back">← Back to Dashboard</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <div id="alertContainer"></div>
+
+                <div class="content-header">
+                    <h2>Weekly Timetable</h2>
+                    <p class="content-description">
+                        This timetable has been optimized based on teacher preferences and attendance patterns. 
+                        You can print or download this schedule for distribution.
+                    </p>
+                </div>
+
+                <div class="table-container">
+                    <table class="timetable" id="timetableTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 120px;">Day</th>
+                                <th>Period 1<br><small style="font-weight: 400; opacity: 0.8;">9:00 - 10:00</small></th>
+                                <th>Period 2<br><small style="font-weight: 400; opacity: 0.8;">10:00 - 11:00</small></th>
+                                <th>Period 3<br><small style="font-weight: 400; opacity: 0.8;">11:00 - 12:00</small></th>
+                                <th>Period 4<br><small style="font-weight: 400; opacity: 0.8;">12:00 - 1:00</small></th>
+                                <th>Period 5<br><small style="font-weight: 400; opacity: 0.8;">2:30 - 5:00</small></th>
+                            </tr>
+                            
+                        </thead>
+                        <tbody>
+                            <!-- Timetable rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="action-bar">
+                    <button id="printButton" class="btn btn-primary">
+                        <span class="btn-icon">🖨️</span>
+                        Print Timetable
+                    </button>
+                    <button id="downloadButton" class="btn btn-secondary">
+                        <span class="btn-icon">⬇️</span>
+                        Download as PDF
+                    </button>
+                </div>
+
+                <div class="card-grid mt-3">
+                    <div class="card">
+                        <h3 class="card-title">Timetable Legend</h3>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 6px;"></div>
+                                <div>
+                                    <strong style="display: block; color: var(--primary-dark);">Subject Name</strong>
+                                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Teacher Name</span>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin: 0;">
+                                Each cell shows the subject and the assigned teacher for that time slot.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">Optimization Score</h3>
+                        <div style="margin-top: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="font-size: 3rem; font-weight: 700; color: var(--primary-color);">94%</div>
+                                <div>
+                                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                        Constraint Satisfaction
+                                    </div>
+                                    <div style="height: 8px; width: 150px; background: var(--border-color); border-radius: 4px; overflow: hidden;">
+                                        <div style="height: 100%; width: 94%; background: linear-gradient(90deg, var(--primary-color), var(--accent-color));"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <p style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 1rem; margin-bottom: 0;">
+                                This timetable satisfies 94% of all teacher preferences and scheduling constraints.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-2">
+                    <h3 class="card-title">Notes</h3>
+                    <ul style="color: var(--text-secondary); line-height: 1.8; margin-left: 1.5rem; margin-bottom: 0;">
+                        <li>This timetable is generated automatically based on teacher preferences and attendance data</li>
+                        <li>Any conflicts or adjustments can be managed through the system settings</li>
+                        <li>The system will continue to learn and improve with more data</li>
+                        <li>For any questions or concerns, please contact the academic administration</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
