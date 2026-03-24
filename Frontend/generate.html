@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Generate Timetable - Automated Timetable Generator">
+    <title>Generate Timetable - Automated Timetable Generator</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/script.js" defer></script>
+</head>
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div>
+                        <h1 class="header-title">Generate Timetable</h1>
+                        <p class="header-subtitle">Create optimized schedules using ML algorithms</p>
+                    </div>
+                    <button class="nav-back">← Back to Dashboard</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <div class="generate-section">
+                    <div id="alertContainer"></div>
+
+                    <div class="generate-card">
+                        <div class="generate-icon">⚙️</div>
+                        
+                        <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--primary-dark);">
+                            Generate Optimized Timetable
+                        </h2>
+
+                        <div class="generate-description">
+                            <p>
+                                Our intelligent timetable generation system uses machine learning algorithms 
+                                to create optimized schedules based on:
+                            </p>
+                            <ul style="text-align: left; max-width: 500px; margin: 1.5rem auto; line-height: 1.8;">
+                                <li><strong>Teacher Preferences:</strong> Considers preferred time slots and days</li>
+                                <li><strong>Attendance Patterns:</strong> Schedules popular subjects at optimal times</li>
+                                <li><strong>Conflict Resolution:</strong> Prevents scheduling conflicts automatically</li>
+                                <li><strong>Resource Optimization:</strong> Maximizes classroom and teacher utilization</li>
+                            </ul>
+                        </div>
+
+                        <div class="generate-options">
+                            <!-- Academic Level -->
+                            <div class="form-group">
+                                <label for="generateLevel" class="form-label">Academic Level *</label>
+                                <select id="generateLevel" class="form-select" required>
+                                    <option value="">Select academic level</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                </select>
+                            </div>
+
+                            <!-- Semester/Term -->
+                            <div class="form-group">
+                                <label for="generateSemester" class="form-label">Semester / Term</label>
+                                <select id="generateSemester" class="form-select">
+                                    <option value="">Select semester (optional)</option>
+                                    <option value="Semester 1">Semester 1</option>
+                                    <option value="Semester 2">Semester 2</option>
+                                    <option value="Summer Term">Summer Term</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button id="generateButton" class="btn btn-primary btn-large">
+                            <span class="btn-icon">⚡</span>
+                            Generate Timetable
+                        </button>
+
+                        <p style="margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+                            Generation typically takes 2-5 seconds depending on complexity
+                        </p>
+                    </div>
+
+                    <div class="card mt-3">
+                        <h3 class="card-title">Understanding the Generation Process</h3>
+                        <p class="card-description" style="margin-bottom: 1rem;">
+                            The timetable generation algorithm follows these steps:
+                        </p>
+                        <div style="display: grid; gap: 1rem;">
+                            <div style="padding: 1rem; background: rgba(26, 77, 46, 0.05); border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                                <strong style="color: var(--primary-dark); display: block; margin-bottom: 0.5rem;">
+                                    1. Data Collection
+                                </strong>
+                                <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                    Gathers all teacher preferences, attendance data, and scheduling constraints
+                                </span>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(26, 77, 46, 0.05); border-radius: 8px; border-left: 4px solid var(--secondary-color);">
+                                <strong style="color: var(--primary-dark); display: block; margin-bottom: 0.5rem;">
+                                    2. Constraint Analysis
+                                </strong>
+                                <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                    Identifies hard constraints (conflicts) and soft constraints (preferences)
+                                </span>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(26, 77, 46, 0.05); border-radius: 8px; border-left: 4px solid var(--accent-color);">
+                                <strong style="color: var(--primary-dark); display: block; margin-bottom: 0.5rem;">
+                                    3. Optimization
+                                </strong>
+                                <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                    Uses ML algorithms to find the optimal schedule that satisfies most constraints
+                                </span>
+                            </div>
+                            <div style="padding: 1rem; background: rgba(26, 77, 46, 0.05); border-radius: 8px; border-left: 4px solid var(--accent-light);">
+                                <strong style="color: var(--primary-dark); display: block; margin-bottom: 0.5rem;">
+                                    4. Validation & Output
+                                </strong>
+                                <span style="color: var(--text-secondary); font-size: 0.95rem;">
+                                    Validates the generated timetable and presents it in an easy-to-read format
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
