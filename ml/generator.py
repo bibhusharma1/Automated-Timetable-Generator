@@ -119,3 +119,86 @@ def _slot_order(self, credits):
             "type": stype,
             "credits": int(credits or 3)
         }
+
+def _schedule_group(self, class_ids):
+        grid  = self._empty_grid(class_ids)
+        tb    = {}   # teacher busy: (tid, day, slot)
+        rb    = {}   # room busy:    (rid, day, slot)
+        daily = {}   # (tid, day) -> count
+
+        # interleave A/B sections so both get fair access
+        interleaved = []
+        a = class_ids[::2]; b = class_ids[1::2]
+        for i in range(max(len(a), len(b))):
+            if i < len(a): interleaved.append(a[i])
+            if i < len(b): interleaved.append(b[i])
+
+        for cid in interleaved:
+            cls      = self.cls_map.get(cid, {})
+            strength = cls.get("strength", 60)
+            subs_raw = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
+
+            theory, labs = [], []
+            for sid in subs_raw:
+                sub = self.sub_map.get(sid, {})
+                if str(sub.get("requires_lab","false")).lower() == "true":
+                    labs.append(sid)
+                else:
+                    theory.append(sid)
+
+            # sort theory by credits desc → high-credit gets prime slots first
+            theory.sort(key=lambda s: -int(self.sub_map.get(s,{}).get("credits",3) or 3))
+
+            day_use = {d: 0 for d in DAYS}
+
+            # ── labs first (2-hr consecutive blocks) ──
+            for sid in labs:
+                sub     = self.sub_map.get(sid, {})
+                lhrs    = int(sub.get("lab_hours_per_week", 2) or 2)
+                credits = sub.get("credits", 2)
+                for _ in range(max(lhrs // 2, 1)):
+                    placed = False
+                    for day in sorted(DAYS, key=lambda d: day_use[d]):
+                        pairs = list(LAB_PAIRS); random.shuffle(pairs)
+                        for s1, s2 in pairs:
+                            if grid[cid][day][s1] or grid[cid][day][s2]: continue
+                            tid = self._pick_teacher(tb, daily, sid, day, s1)
+                            if not tid or not self._teacher_free(tb, tid, day, s2): continue
+                            rid = self._pick_room(rb, sid, strength, day, s1)
+                            if not rid or not self._room_free(rb, rid, day, s2): continue
+                            entry = self._make_entry(sid, tid, rid, "lab", credits)
+                            grid[cid][day][s1] = entry
+                            grid[cid][day][s2] = {**entry, "lab_continuation": True}
+                            tb[(tid,day,s1)] = tb[(tid,day,s2)] = True
+                            rb[(rid,day,s1)] = rb[(rid,day,s2)] = True
+                            daily[(tid,day)] = daily.get((tid,day),0) + 2
+                            day_use[day] += 2
+                            placed = True; break
+                        if placed: break
+
+            # ── theory sessions ──
+            for sid in theory:
+                sub     = self.sub_map.get(sid, {})
+                hrs     = int(sub.get("hours_per_week", 3) or 3)
+                credits = sub.get("credits", 3)
+                sorder  = self._slot_order(credits)
+                for _ in range(hrs):
+                    for day in sorted(DAYS, key=lambda d: day_use[d]):
+                        placed = False
+                        for slot in sorder:
+                            if slot == LUNCH: continue
+                            if grid[cid][day][slot]: continue
+                            tid = self._pick_teacher(tb, daily, sid, day, slot)
+                            if not tid: continue
+                            rid = self._pick_room(rb, sid, strength, day, slot)
+                            if not rid: continue
+                            entry = self._make_entry(sid, tid, rid, "theory", credits)
+                            grid[cid][day][slot] = entry
+                            tb[(tid,day,slot)] = True
+                            rb[(rid,day,slot)]  = True
+                            daily[(tid,day)] = daily.get((tid,day),0) + 1
+                            day_use[day] += 1
+                            placed = True; break
+                        if placed: break
+
+        return grid
