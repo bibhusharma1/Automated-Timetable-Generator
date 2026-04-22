@@ -1,0 +1,33 @@
+/* ================================================================
+   TimeForge v2 — Stylesheet
+   ================================================================ */
+
+:root {
+  --bg:       #08090d;
+  --bg2:      #0f1016;
+  --bg3:      #161820;
+  --border:   #22253a;
+  --border2:  #2d3150;
+  --text:     #dde1f5;
+  --muted:    #5a607a;
+  --amber:    #f5a623;
+  --amber2:   #ffd166;
+  --cyan:     #06d6a0;
+  --cyan2:    #38f9d7;
+  --violet:   #7b61ff;
+  --rose:     #ff6b8a;
+  --theory:   #3d5afe;
+  --lab:      #00bfa5;
+  --lunch:    #ff6e40;
+  --free:     #1e2035;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
