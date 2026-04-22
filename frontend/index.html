@@ -165,8 +165,41 @@
       <button class="vsw" id="vsw-teacher" onclick="switchView('teacher')">👩‍🏫 Teacher Timetable</button>
       <button class="vsw" id="vsw-analysis" onclick="switchView('analysis')">📊 Analysis</button>
     </div>
+    <!-- ── CLASS VIEW ── -->
+    <div class="view-panel" id="vp-class">
+      <div class="entity-bar" id="classBar"></div>
+      <div class="tt-legend" id="ttLegend"></div>
+      <div class="tt-wrapper">
+        <table class="tt" id="classTT">
+          <thead id="classTTHead"></thead>
+          <tbody id="classTTBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── TEACHER VIEW ── -->
+    <div class="view-panel hidden" id="vp-teacher">
+      <div class="teacher-stats-row" id="teacherStatsRow"></div>
+      <div class="entity-bar" id="teacherBar"></div>
+      <div class="tt-wrapper">
+        <table class="tt" id="teacherTT">
+          <thead id="teacherTTHead"></thead>
+          <tbody id="teacherTTBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── ANALYSIS VIEW ── -->
+    <div class="view-panel hidden" id="vp-analysis">
+      <div class="analysis-grid">
+        <div class="an-card" id="an-conflicts"></div>
+        <div class="an-card" id="an-subjectFreq"></div>
+        <div class="an-card wide" id="an-teacherLoad"></div>
+        <div class="an-card" id="an-creditDist"></div>
+        <div class="an-card" id="an-dayBalance"></div>
+      </div>
+    </div>
     
-</section>
 </section>
 
 </main>
