@@ -89,3 +89,34 @@
     </div>
   </div>
 </div>
+<!-- DROP ZONES -->
+<div class="drop-grid">
+  <div class="drop-zone" id="dz-subjects" data-name="subjects">
+    <input type="file" accept=".csv" onchange="handleFile('subjects',this)"/>
+    <div class="dz-icon">📚</div>
+    <div class="dz-label">subjects.csv</div>
+    <div class="dz-hint">Drag & drop or click</div>
+    <div class="dz-status" id="dzs-subjects"></div>
+  </div>
+  <div class="drop-zone" id="dz-teachers" data-name="teachers">
+    <input type="file" accept=".csv" onchange="handleFile('teachers',this)"/>
+    <div class="dz-icon">👩‍🏫</div>
+    <div class="dz-label">teachers.csv</div>
+    <div class="dz-hint">Drag & drop or click</div>
+    <div class="dz-status" id="dzs-teachers"></div>
+  </div>
+  <div class="drop-zone" id="dz-rooms" data-name="rooms">
+    <input type="file" accept=".csv" onchange="handleFile('rooms',this)"/>
+    <div class="dz-icon">🏫</div>
+    <div class="dz-label">rooms.csv</div>
+    <div class="dz-hint">Drag & drop or click</div>
+    <div class="dz-status" id="dzs-rooms"></div>
+  </div>
+  <div class="drop-zone" id="dz-classes" data-name="classes">
+    <input type="file" accept=".csv" onchange="handleFile('classes',this)"/>
+    <div class="dz-icon">🎓</div>
+    <div class="dz-label">classes.csv</div>
+    <div class="dz-hint">Drag & drop or click</div>
+    <div class="dz-status" id="dzs-classes"></div>
+  </div>
+</div>
