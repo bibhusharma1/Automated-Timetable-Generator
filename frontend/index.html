@@ -120,3 +120,30 @@
     <div class="dz-status" id="dzs-classes"></div>
   </div>
 </div>
+<details class="paste-details">
+  <summary>✏️ Paste CSV manually instead</summary>
+  <div class="paste-grid">
+    <div><label>subjects.csv</label><textarea id="ta-subjects" placeholder="subject_id,subject_name,…"></textarea></div>
+    <div><label>teachers.csv</label><textarea id="ta-teachers" placeholder="teacher_id,teacher_name,…"></textarea></div>
+    <div><label>rooms.csv</label><textarea id="ta-rooms" placeholder="room_id,room_name,…"></textarea></div>
+    <div><label>classes.csv</label><textarea id="ta-classes" placeholder="class_id,class_name,…"></textarea></div>
+  </div>
+</details>
+
+<div class="preview-section" id="previewSection" style="display:none">
+  <h3>Data Preview</h3>
+  <div class="preview-tabs">
+    <button class="ptab active" onclick="showPreview('subjects',this)">Subjects</button>
+    <button class="ptab" onclick="showPreview('teachers',this)">Teachers</button>
+    <button class="ptab" onclick="showPreview('rooms',this)">Rooms</button>
+    <button class="ptab" onclick="showPreview('classes',this)">Classes</button>
+  </div>
+  <div id="previewTable"></div>
+</div>
+
+<div class="generate-row">
+  <button class="btn btn-generate" onclick="generate()" id="genBtn">⚡ Generate Timetable</button>
+  <button class="btn btn-ghost" onclick="clearAll()">✕ Clear All</button>
+</div>
+
+</section>
