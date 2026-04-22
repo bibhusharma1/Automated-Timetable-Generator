@@ -19,6 +19,10 @@ LAB_PAIRS  = [
 PRIME     = ["8:00-9:00","9:00-10:00","10:00-11:00","11:00-12:00"]
 AFTERNOON = ["1:00-2:00","2:00-3:00","3:00-4:00"]
 
+
+
+
+
 class TimetableGenerator:
 
     def __init__(self, subj_df, teach_df, room_df, class_df):
@@ -45,3 +49,14 @@ class TimetableGenerator:
 
         self.labs = [str(r["room_id"]) for _, r in room_df.iterrows()
                      if str(r["room_type"]).lower() == "lab"]
+        
+
+
+def _empty_grid(self, class_ids):
+        return {cid: {d: {s: None for s in SLOTS} for d in DAYS} for cid in class_ids}
+
+    def _teacher_free(self, tb, tid, day, slot):
+        return (tid, day, slot) not in tb
+
+    def _room_free(self, rb, rid, day, slot):
+        return (rid, day, slot) not in rb
