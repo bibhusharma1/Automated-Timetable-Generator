@@ -31,3 +31,26 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
 }
+
+/* ── AMBIENT BACKGROUND ─────────────────────────────────────────── */
+.ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(120px); opacity: 0.18;
+}
+.orb-1 { width: 700px; height: 700px; background: var(--violet); top: -200px; left: -200px; animation: drift1 14s ease-in-out infinite; }
+.orb-2 { width: 500px; height: 500px; background: var(--amber);  bottom: -100px; right: -100px; animation: drift2 18s ease-in-out infinite; }
+.orb-3 { width: 400px; height: 400px; background: var(--cyan);   top: 40%; left: 50%; animation: drift3 22s ease-in-out infinite; }
+
+@keyframes drift1 { 0%,100%{transform:translate(0,0)}  50%{transform:translate(60px,80px)} }
+@keyframes drift2 { 0%,100%{transform:translate(0,0)}  50%{transform:translate(-80px,-60px)} }
+@keyframes drift3 { 0%,100%{transform:translate(-50%,-50%)} 50%{transform:translate(-45%,-55%)} }
+
+.grid-bg {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(123,97,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(123,97,255,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
