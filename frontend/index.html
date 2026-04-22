@@ -64,3 +64,28 @@
     <button class="btn btn-accent" onclick="loadSample()">⚡ Load Sample CSE Data</button>
     <button class="btn btn-ghost" onclick="showFormatGuide()">📋 CSV Format Guide</button>
   </div>
+  <!-- FORMAT GUIDE (hidden by default) -->
+<div class="format-guide" id="formatGuide" style="display:none">
+  <div class="fg-grid">
+    <div class="fg-card">
+      <div class="fg-title">📚 subjects.csv</div>
+      <code>subject_id, subject_name, year, semester, credits, hours_per_week, subject_type, requires_lab, lab_hours_per_week</code>
+      <div class="fg-note">credits drives morning slot priority. requires_lab=true → placed in lab rooms as 2-hr blocks.</div>
+    </div>
+    <div class="fg-card">
+      <div class="fg-title">👩‍🏫 teachers.csv</div>
+      <code>teacher_id, teacher_name, designation, subjects, max_hours_per_day, available_days</code>
+      <div class="fg-note">subjects = comma-separated IDs like "S501,S502". available_days = "Mon,Tue,Wed,Thu,Fri".</div>
+    </div>
+    <div class="fg-card">
+      <div class="fg-title">🏫 rooms.csv</div>
+      <code>room_id, room_name, capacity, room_type, building</code>
+      <div class="fg-note">room_type = classroom | lab | activity. Labs auto-matched to lab subjects.</div>
+    </div>
+    <div class="fg-card">
+      <div class="fg-title">🎓 classes.csv</div>
+      <code>class_id, class_name, year, semester, strength, subjects</code>
+      <div class="fg-note">semester is key — each semester group is scheduled independently for max score.</div>
+    </div>
+  </div>
+</div>
