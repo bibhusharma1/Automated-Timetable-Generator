@@ -60,3 +60,47 @@ def _empty_grid(self, class_ids):
 
     def _room_free(self, rb, rid, day, slot):
         return (rid, day, slot) not in rb
+
+
+def _pick_teacher(self, tb, daily, sid, day, slot):
+
+        candidates = list(self.sub2teach.get(sid, []))
+        random.shuffle(candidates)
+
+        for tid in candidates:
+            t = self.teach_map.get(tid, {})
+
+            maxd = int(t.get("max_hours_per_day", 5) or 5)
+            avail = str(t.get("available_days","Mon,Tue,Wed,Thu,Fri"))
+
+            if day[:3] not in avail:
+                continue
+
+            if daily.get((tid, day), 0) >= maxd:
+                continue
+
+            if not self._teacher_free(tb, tid, day, slot):
+                continue
+
+            return tid
+
+        return None
+
+
+    def _pick_room(self, rb, sid, strength, day, slot):
+
+        sub = self.sub_map.get(sid, {})
+        is_lab = str(sub.get("requires_lab","false")).lower() == "true"
+
+        pool = self.labs if is_lab else self.classrooms
+        random.shuffle(pool)
+
+        for rid in pool:
+            r = self.room_map.get(rid, {})
+            if int(r.get("capacity", 0) or 0) < int(strength or 0):
+                continue
+
+            if self._room_free(rb, rid, day, slot):
+                return rid
+
+        return None
