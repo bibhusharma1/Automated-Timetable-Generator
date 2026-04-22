@@ -9,3 +9,25 @@
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
+    <!-- AMBIENT BG -->
+<div class="ambient" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="grid-bg"></div>
+</div>
+
+<!-- LOADING -->
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-ring"></div>
+    <div class="loader-steps" id="loaderSteps">
+      <div class="lstep" id="ls0">⬡ Parsing CSV data…</div>
+      <div class="lstep" id="ls1">⬡ Building constraint graph…</div>
+      <div class="lstep" id="ls2">⬡ Credit-weighted slot assignment…</div>
+      <div class="lstep" id="ls3">⬡ Placing lab blocks…</div>
+      <div class="lstep" id="ls4">⬡ Resolving teacher conflicts…</div>
+      <div class="lstep" id="ls5">⬡ Finalising schedule…</div>
+    </div>
+  </div>
+</div>
