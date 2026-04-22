@@ -54,3 +54,28 @@ body {
     linear-gradient(90deg, rgba(123,97,255,0.04) 1px, transparent 1px);
   background-size: 48px 48px;
 }
+
+/* ── LOADER ─────────────────────────────────────────────────────── */
+.loader {
+  display: none; position: fixed; inset: 0; z-index: 999;
+  background: rgba(8,9,13,0.92); backdrop-filter: blur(12px);
+  align-items: center; justify-content: center;
+}
+.loader.show { display: flex; }
+.loader-inner { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+.loader-ring {
+  width: 64px; height: 64px;
+  border: 3px solid var(--border2);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-steps { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.lstep {
+  font-family: 'Fira Code', monospace; font-size: 0.8rem;
+  color: var(--muted); opacity: 0; transition: opacity 0.4s, color 0.4s;
+}
+.lstep.on { opacity: 1; color: var(--cyan2); }
