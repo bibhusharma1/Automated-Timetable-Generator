@@ -104,3 +104,18 @@ def _pick_teacher(self, tb, daily, sid, day, slot):
                 return rid
 
         return None
+
+def _slot_order(self, credits):
+        c = int(credits or 3)
+        return PRIME + AFTERNOON if c >= 4 else THEORY_SL
+
+
+    def _make_entry(self, sid, tid, rid, stype, credits):
+
+        return {
+            "subject_id": sid,
+            "teacher_id": tid,
+            "room_id": rid,
+            "type": stype,
+            "credits": int(credits or 3)
+        }
