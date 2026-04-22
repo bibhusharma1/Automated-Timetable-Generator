@@ -79,3 +79,26 @@ body {
   color: var(--muted); opacity: 0; transition: opacity 0.4s, color 0.4s;
 }
 .lstep.on { opacity: 1; color: var(--cyan2); }
+
+/* ── HEADER ─────────────────────────────────────────────────────── */
+header {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 40px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,9,13,0.85); backdrop-filter: blur(16px);
+}
+.logo {
+  font-size: 1.5rem; font-weight: 700; letter-spacing: -0.5px;
+  color: var(--text);
+}
+.logo span { color: var(--amber); }
+.logo sup { font-size: 0.6rem; color: var(--muted); vertical-align: super; margin-left: 2px; }
+.tagline { font-size: 0.72rem; color: var(--muted); font-family: 'Fira Code', monospace; margin-top: 2px; }
+
+.pill {
+  font-family: 'Fira Code', monospace; font-size: 0.7rem;
+  padding: 4px 12px; border-radius: 999px; font-weight: 500;
+}
+.pill-green { background: rgba(6,214,160,0.12); color: var(--cyan); border: 1px solid rgba(6,214,160,0.3); }
+.pill-amber { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.3); }
