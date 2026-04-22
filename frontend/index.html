@@ -147,7 +147,26 @@
 </div>
 
 </section>
-<section class="section" id="sec-results" style="display:none"></section>
+<section class="section" id="sec-results" style="display:none">
+
+  <!-- SCORE BANNER -->
+    <div class="score-banner">
+      <div class="score-left">
+        <div class="score-num" id="scoreNum">—</div>
+        <div class="score-label">Optimization Score</div>
+        <div class="score-bar-wrap"><div class="score-bar-fill" id="scoreFill" style="width:0%"></div></div>
+      </div>
+      <div class="score-stats" id="scoreStats"></div>
+    </div>
+
+     <!-- VIEW SWITCHER -->
+    <div class="view-switcher">
+      <button class="vsw active" id="vsw-class" onclick="switchView('class')">🎓 Class Timetable</button>
+      <button class="vsw" id="vsw-teacher" onclick="switchView('teacher')">👩‍🏫 Teacher Timetable</button>
+      <button class="vsw" id="vsw-analysis" onclick="switchView('analysis')">📊 Analysis</button>
+    </div>
+    
+</section>
 </section>
 
 </main>
