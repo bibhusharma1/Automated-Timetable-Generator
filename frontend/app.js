@@ -105,3 +105,11 @@ function splitCSVLine(line) {
   out.push(cur);
   return out.map(v => v.replace(/^"|"$/g,'').trim());
 }
+/* ── TOAST ──────────────────────────────────────────────────────── */
+function toast(msg, type='ok') {
+  const el = document.createElement('div');
+  el.className = toast toast-${type};
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3800);
+}
