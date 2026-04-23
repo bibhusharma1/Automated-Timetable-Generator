@@ -377,3 +377,29 @@ function demoGenerate() {
 
 function shuffle(arr) { for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
 function sortedDays(use) { return [...DAYS].sort((a,b)=>(use[a]||0)-(use[b]||0)); }
+/* ── RENDER RESULTS ─────────────────────────────────────────────── */
+function renderResults() {
+  document.getElementById('sec-results').style.display = 'block';
+  document.getElementById('sec-results').scrollIntoView({behavior:'smooth', block:'start'});
+
+  // score banner
+  setTimeout(()=>{
+    document.getElementById('scoreNum').textContent = ${S.score}%;
+    document.getElementById('scoreFill').style.width = ${S.score}%;
+  }, 100);
+
+  const classCount   = Object.keys(S.timetable.class).length;
+  const teacherCount = Object.keys(S.timetable.teacher).length;
+  const totalSessions = Object.values(S.timetable.class).reduce((acc,c)=>acc+Object.values(c.timetable).flat().filter(s=>s.session&&!s.session?.lab_continuation).length, 0);
+
+  document.getElementById('scoreStats').innerHTML = `
+    <div class="sstat"><div class="sstat-val">${classCount}</div><div class="sstat-lbl">classes scheduled</div></div>
+    <div class="sstat"><div class="sstat-val">${teacherCount}</div><div class="sstat-lbl">teachers assigned</div></div>
+    <div class="sstat"><div class="sstat-val">${totalSessions}</div><div class="sstat-lbl">total sessions</div></div>`;
+
+  buildClassBar();
+  buildTeacherBar();
+  buildLegend();
+  buildAnalysis();
+  setStep(3,'done'); setStep(4,'active');
+}
