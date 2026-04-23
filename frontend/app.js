@@ -125,3 +125,53 @@ function hideLoader() {
   document.getElementById('loader').classList.remove('show');
   _loaderTimers.forEach(clearTimeout);
 }
+/* ── PROGRESS STEPS ─────────────────────────────────────────────── */
+function setStep(n, state) {
+  const el = document.getElementById(ps${n});
+  const ln = document.getElementById(pl${n});
+  el.className = prog-step ${state};
+  if (ln && state==='done') ln.classList.add('done');
+}
+
+/* ── FILE HANDLING ──────────────────────────────────────────────── */
+function handleFile(name, input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    loadCSV(name, e.target.result, file.name);
+  };
+  reader.readAsText(file);
+}
+
+function loadCSV(name, content, filename) {
+  S.csv[name] = content;
+  document.getElementById(ta-${name}).value = content;
+  const dz = document.getElementById(dz-${name});
+  dz.classList.add('filled');
+  document.getElementById(dzs-${name}).textContent = ✓ ${filename || name+'.csv'};
+
+  S.parsedCSV[name] = parseCSV(content);
+  updatePreviewSection();
+  toast(${name}.csv loaded — ${S.parsedCSV[name].length} rows, 'ok');
+}
+
+function updatePreviewSection() {
+  const loaded = Object.keys(S.parsedCSV).filter(k => S.parsedCSV[k]?.length > 0);
+  if (!loaded.length) return;
+  document.getElementById('previewSection').style.display = 'block';
+  showPreview(loaded[0], document.querySelector('.ptab'));
+}
+
+function showPreview(name, btn) {
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const rows = S.parsedCSV[name] || [];
+  if (!rows.length) { document.getElementById('previewTable').innerHTML = '<p style="color:var(--muted);font-size:0.8rem;padding:8px">No data loaded for '+name+'</p>'; return; }
+  const cols = Object.keys(rows[0]);
+  document.getElementById('previewTable').innerHTML = `
+    <table>
+      <thead><tr>${cols.map(c=><th>${c}</th>).join('')}</tr></thead>
+      <tbody>${rows.slice(0,10).map(r=><tr>${cols.map(c=><td>${r[c]||''}</td>).join('')}</tr>).join('')}</tbody>
+    </table>
+    ${rows.length>10?<p style="font-size:0.72rem;color:var(--muted);padding:6px 0">+${rows.length-10} more rows…</p>:''}`;
+}
