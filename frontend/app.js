@@ -422,3 +422,304 @@ function buildLegend() {
     <div class="legend-item"><div class="legend-dot" style="background:var(--bg3)"></div>Free Slot</div>
     <div class="legend-item">🟡 Credit score shown on each session</div>`;
 }
+/* ── CLASS BAR + TIMETABLE ──────────────────────────────────────── */
+function buildClassBar() {
+  const ct = S.timetable.class;
+  // group by semester
+  const semMap = {};
+  Object.entries(ct).forEach(([cid, cls]) => {
+    const sem = cls.semester || '?';
+    semMap[sem] = semMap[sem] || [];
+    semMap[sem].push({cid, cls});
+  });
+
+  let html = '';
+  Object.entries(semMap).sort((a,b)=>+a[0]-+b[0]).forEach(([sem, items]) => {
+    html += <div class="ebar-group"><span class="ebar-sem-label">Sem ${sem}</span>;
+    items.forEach(({cid,cls}) => {
+      const active = cid===S.currentClass ? ' active' : '';
+      html += <button class="ebar-btn${active}" onclick="selectClass('${cid}',this)">${cls.class_name}</button>;
+    });
+    html += </div>;
+  });
+  document.getElementById('classBar').innerHTML = html;
+
+  if (!S.currentClass) S.currentClass = Object.keys(ct)[0];
+  renderClassTT(S.currentClass);
+}
+
+function selectClass(cid, btn) {
+  document.querySelectorAll('#classBar .ebar-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  S.currentClass = cid;
+  renderClassTT(cid);
+}
+
+function renderClassTT(cid) {
+  const cls = S.timetable.class[cid];
+  // header
+  document.getElementById('classTTHead').innerHTML = <tr><th>TIME SLOT</th>${DAYS.map(d=><th>${d}</th>).join('')}</tr>;
+  // body
+  document.getElementById('classTTBody').innerHTML = SLOTS.map(slot => {
+    const td = DAYS.map(day => {
+      const sdata = cls.timetable[day].find(s=>s.slot===slot);
+      return <td>${cellHTML(sdata)}</td>;
+    }).join('');
+    return <tr><td>${slot}</td>${td}</tr>;
+  }).join('');
+}
+
+function cellHTML(sdata) {
+  if (!sdata) return <div class="cell cell-free"></div>;
+  if (sdata.is_lunch) return <div class="cell cell-lunch"><div class="cell-lunch-text">☕ LUNCH</div></div>;
+  const sess = sdata.session;
+  if (!sess) return <div class="cell cell-free"></div>;
+  if (sess.lab_continuation) return <div class="cell cell-lab continuation"><div class="cell-teacher" style="padding-top:20px;text-align:center;font-size:0.7rem">↑ Lab continues</div></div>;
+  const isLab = sess.type==='lab';
+  const borderColor = sess.color || (isLab?'#00bfa5':'#3d5afe');
+  return `<div class="cell cell-${sess.type}" style="border-top-color:${borderColor}">
+    <span class="cell-tag tag-${sess.type}">${isLab?'LAB':'THEORY'}</span>
+    <span class="cell-tag tag-credit">C:${sess.credits}</span>
+    <div class="cell-subj">${sess.subject_name}</div>
+    <div class="cell-teacher">👤 ${sess.teacher_name}</div>
+    <div class="cell-room">📍 ${sess.room_name}</div>
+  </div>`;
+}
+
+/* ── TEACHER BAR + TIMETABLE ────────────────────────────────────── */
+function buildTeacherBar() {
+  const tt = S.timetable.teacher;
+  let html = '';
+  Object.entries(tt).forEach(([tid, tch]) => {
+    const active = tid===S.currentTeacher ? ' active' : '';
+    const hrs = tch.total_weekly;
+    html += <button class="ebar-btn${active}" onclick="selectTeacher('${tid}',this)" title="${tch.designation} — ${hrs} hrs/week">${tch.teacher_name.split(' ').slice(-1)[0]}<sup> ${hrs}h</sup></button>;
+  });
+  document.getElementById('teacherBar').innerHTML = html;
+  if (!S.currentTeacher) S.currentTeacher = Object.keys(tt)[0];
+  renderTeacherTT(S.currentTeacher);
+}
+
+function renderTeacherStats() {
+  const tid = S.currentTeacher;
+  if (!tid || !S.timetable) return;
+  const tch = S.timetable.teacher[tid];
+  document.getElementById('teacherStatsRow').innerHTML = `
+    <div class="tstat-card">
+      <div class="tstat-name">${tch.teacher_name}</div>
+      <div class="tstat-desig">${tch.designation}</div>
+      <div class="tstat-hrs">${tch.total_weekly} <span style="font-size:0.8rem;color:var(--muted)">hrs/week</span></div>
+      <div class="tstat-sub">Max workload view</div>
+    </div>`;
+}
+
+function selectTeacher(tid, btn) {
+  document.querySelectorAll('#teacherBar .ebar-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  S.currentTeacher = tid;
+  renderTeacherTT(tid);
+  renderTeacherStats();
+}
+
+function renderTeacherTT(tid) {
+  const tch = S.timetable.teacher[tid];
+  document.getElementById('teacherTTHead').innerHTML = <tr><th>TIME SLOT</th>${DAYS.map(d=><th>${d}</th>).join('')}</tr>;
+  document.getElementById('teacherTTBody').innerHTML = SLOTS.map(slot => {
+    const td = DAYS.map(day => {
+      const sdata = tch.timetable[day]?.find(s=>s.slot===slot);
+      return <td>${teacherCellHTML(sdata)}</td>;
+    }).join('');
+    return <tr><td>${slot}</td>${td}</tr>;
+  }).join('');
+}
+
+function teacherCellHTML(sdata) {
+  if (!sdata) return <div class="cell cell-free"></div>;
+  if (sdata.is_lunch) return <div class="cell cell-lunch"><div class="cell-lunch-text">☕ LUNCH</div></div>;
+  const sess = sdata.session;
+  if (!sess) return <div class="cell cell-free"></div>;
+  if (sess.lab_continuation) return <div class="cell cell-lab continuation"><div class="cell-teacher" style="padding-top:20px;text-align:center;font-size:0.7rem">↑ Lab</div></div>;
+  const isLab = sess.type==='lab';
+  const borderColor = sess.color || (isLab?'#00bfa5':'#3d5afe');
+  return `<div class="cell cell-${sess.type}" style="border-top-color:${borderColor}">
+    <span class="cell-tag tag-${sess.type}">${isLab?'LAB':'THEORY'}</span>
+    <span class="cell-tag tag-credit">C:${sess.credits}</span>
+    <div class="cell-subj">${sess.subject_name}</div>
+    <div class="cell-class">🎓 ${sess.class_name||''}</div>
+    <div class="cell-room">📍 ${sess.room_name}</div>
+  </div>`;
+}
+
+/* ── ANALYSIS ───────────────────────────────────────────────────── */
+function buildAnalysis() {
+  const ct = S.timetable.class;
+  const tt = S.timetable.teacher;
+
+  // conflicts
+  const teacherSlots = {}, conflicts = [];
+  Object.entries(ct).forEach(([cid,cls])=>{
+    Object.entries(cls.timetable).forEach(([day,slots])=>{
+      slots.forEach(s=>{
+        const sess=s.session; if(!sess||sess.lab_continuation) return;
+        const key=${sess.teacher_id}|${day}|${s.slot};
+        if(teacherSlots[key]) conflicts.push(${sess.teacher_name} double-booked ${day} ${s.slot});
+        teacherSlots[key]=cid;
+      });
+    });
+  });
+  const conflictSet = [...new Set(conflicts)];
+  document.getElementById('an-conflicts').innerHTML = `
+    <div class="an-title"><div class="an-dot"></div>Conflict Report</div>
+    ${conflictSet.length===0
+      ? <div class="conflict-ok">✅ No conflicts detected!</div>
+      : conflictSet.map(c=><div class="conflict-item">⚠ ${c}</div>).join('')}`;
+
+  // subject frequency
+  const subFreq = {};
+  Object.values(ct).forEach(cls=>Object.values(cls.timetable).flat().forEach(s=>{
+    const sess=s.session; if(!sess||sess.lab_continuation) return;
+    subFreq[sess.subject_name]=(subFreq[sess.subject_name]||0)+1;
+  }));
+  const maxF = Math.max(...Object.values(subFreq),1);
+  document.getElementById('an-subjectFreq').innerHTML = `
+    <div class="an-title"><div class="an-dot"></div>Subject Distribution</div>
+    <div class="barchart">${Object.entries(subFreq).sort((a,b)=>b[1]-a[1]).slice(0,12).map(([n,c])=>`
+      <div class="bar-row">
+        <div class="bar-lbl" title="${n}">${n}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${c/maxF*100}%;background:linear-gradient(90deg,var(--violet),var(--cyan))"></div></div>
+        <div class="bar-val">${c}</div>
+      </div>).join('')}</div>;
+
+  // teacher load
+  const loads = Object.values(tt).map(t=>({name:t.teacher_name, hrs:t.total_weekly, desig:t.designation})).sort((a,b)=>b.hrs-a.hrs);
+  const maxL = Math.max(...loads.map(l=>l.hrs),1);
+  document.getElementById('an-teacherLoad').innerHTML = `
+    <div class="an-title"><div class="an-dot"></div>Teacher Weekly Load</div>
+    <div class="barchart" style="display:grid;grid-template-columns:1fr 1fr;gap:8px 20px">
+    ${loads.map(l=>`
+      <div class="bar-row">
+        <div class="bar-lbl" title="${l.desig}">${l.name.split(' ').slice(-2).join(' ')}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${l.hrs/maxL*100}%;background:linear-gradient(90deg,var(--amber),var(--rose))"></div></div>
+        <div class="bar-val">${l.hrs}</div>
+      </div>`).join('')}
+    </div>`;
+
+  // credit distribution
+  const subMeta = S.meta?.subjects || parseCSV(S.csv.subjects);
+  const creditCounts = {};
+  subMeta.forEach(s=>{ const c=parseInt(s.credits||3); creditCounts[c]=(creditCounts[c]||0)+1; });
+  document.getElementById('an-creditDist').innerHTML = `
+    <div class="an-title"><div class="an-dot"></div>Credit Distribution</div>
+    <div class="credit-grid">${Object.entries(creditCounts).sort((a,b)=>+b[0]-+a[0]).map(([cr,cnt])=>`
+      <div class="credit-badge"><div class="credit-num">${cnt}</div><div class="credit-lbl">${cr}-credit subjects</div></div>`).join('')}
+    </div>`;
+
+  // day balance
+  const dayCount = {};
+  DAYS.forEach(d=>dayCount[d]=0);
+  Object.values(ct).forEach(cls=>DAYS.forEach(d=>{
+    cls.timetable[d].forEach(s=>{ if(s.session&&!s.session.lab_continuation) dayCount[d]++; });
+  }));
+  const maxDay=Math.max(...Object.values(dayCount),1);
+  document.getElementById('an-dayBalance').innerHTML = `
+    <div class="an-title"><div class="an-dot"></div>Day-wise Session Balance</div>
+    <div class="barchart">${DAYS.map(d=>`
+      <div class="bar-row">
+        <div class="bar-lbl">${d}</div>
+        <div class="bar-bg"><div class="bar-fill" style="width:${dayCount[d]/maxDay*100}%;background:linear-gradient(90deg,var(--cyan),var(--cyan2))"></div></div>
+        <div class="bar-val">${dayCount[d]}</div>
+      </div>`).join('')}
+    </div>`;
+}
+
+/* ── EXPORT ─────────────────────────────────────────────────────── */
+function exportCSV(view) {
+  if (!S.timetable) { toast('Generate timetable first', 'err'); return; }
+  const rows = [view==='class'
+    ? ['Class','Day','Time Slot','Is Lunch','Type','Subject','Teacher','Room','Credits']
+    : ['Teacher','Day','Time Slot','Is Lunch','Type','Subject','Assigned Class','Room','Credits']];
+
+  if (view==='class') {
+    Object.values(S.timetable.class).forEach(cls=>{
+      Object.entries(cls.timetable).forEach(([day,slots])=>{
+        slots.forEach(s=>{
+          const sess=s.session;
+          rows.push([cls.class_name, day, s.slot, s.is_lunch?'Yes':'No',
+            sess?sess.type:(s.is_lunch?'LUNCH':'FREE'),
+            sess?.subject_name||'', sess?.teacher_name||'', sess?.room_name||'', sess?.credits||'']);
+        });
+      });
+    });
+  } else {
+    Object.values(S.timetable.teacher).forEach(tch=>{
+      Object.entries(tch.timetable).forEach(([day,slots])=>{
+        slots.forEach(s=>{
+          const sess=s.session;
+          rows.push([tch.teacher_name, day, s.slot, s.is_lunch?'Yes':'No',
+            sess?sess.type:(s.is_lunch?'LUNCH':'FREE'),
+            sess?.subject_name||'', sess?.class_name||'', sess?.room_name||'', sess?.credits||'']);
+        });
+      });
+    });
+  }
+
+  const csv = rows.map(r=>r.map(v=>"${v}").join(',')).join('\n');
+  dlBlob(new Blob([csv],{type:'text/csv'}), timetable_${view}.csv);
+  toast(${view} CSV downloaded, 'ok');
+  setStep(4,'done');
+}
+
+function exportJSON() {
+  if (!S.timetable) { toast('Generate timetable first', 'err'); return; }
+  dlBlob(new Blob([JSON.stringify({score:S.score, timetable:S.timetable},null,2)],{type:'application/json'}), 'timetable.json');
+  toast('JSON downloaded', 'ok');
+}
+
+function dlBlob(blob, name) {
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+}
+
+function printView() {
+  if (!S.timetable || !S.currentClass) { toast('Generate timetable first','err'); return; }
+  const cls = S.timetable.class[S.currentClass];
+  const win = window.open('','_blank');
+  const rows = SLOTS.map(slot=>`<tr>
+    <td><b>${slot}</b></td>
+    ${DAYS.map(day=>{
+      const s = cls.timetable[day]?.find(x=>x.slot===slot);
+      if(!s) return '<td>—</td>';
+      if(s.is_lunch) return '<td style="background:#fff3cd">☕ Lunch</td>';
+      const sess=s.session;
+      if(!sess) return '<td style="color:#999">Free</td>';
+      if(sess.lab_continuation) return '<td style="background:#e8f5e9;color:#888">↑ Lab cont.</td>';
+      const bg=sess.type==='lab'?'#e0f2f1':'#e8eaf6';
+      return <td style="background:${bg}"><b>${sess.subject_name}</b><br><small>${sess.teacher_name}</small><br><small>${sess.room_name}</small><br><small>Credits: ${sess.credits}</small></td>;
+    }).join('')}
+  </tr>`).join('');
+  win.document.write(`<!DOCTYPE html><html><head><title>${cls.class_name}</title>
+    <style>body{font-family:Arial,sans-serif;padding:20px}h1{margin-bottom:16px;font-size:1.2rem}
+    table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;font-size:11px;text-align:center}
+    th{background:#3d5afe;color:white}</style></head><body>
+    <h1>${cls.class_name} — Weekly Timetable (Year ${cls.year}, Semester ${cls.semester}) | Score: ${S.score}%</h1>
+    <table><thead><tr><th>Time</th>${DAYS.map(d=><th>${d}</th>).join('')}</tr></thead>
+    <tbody>${rows}</tbody></table></body></html>`);
+  win.print();
+}
+
+/* ── DRAG & DROP ────────────────────────────────────────────────── */
+document.querySelectorAll('.drop-zone').forEach(zone => {
+  const name = zone.dataset.name;
+  zone.addEventListener('click', e => { if(e.target.tagName==='INPUT') return; zone.querySelector('input[type=file]').click(); });
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('over');
+    const file = e.dataTransfer.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => loadCSV(name, ev.target.result, file.name);
+    reader.readAsText(file);
+  });
+});
+
+/* ── INIT ───────────────────────────────────────────────────────── */
+setStep(1,'active');
