@@ -26,12 +26,8 @@ SUBJECT_COLORS = [
     "#69f0ae","#ffff00","#ff6e40","#18ffff","#b9f6ca",
 ]
 
-
-
 class TimetableGenerator:
-
     def __init__(self, subj_df, teach_df, room_df, class_df):
-
         self.subj_df  = subj_df.fillna("").copy()
         self.teach_df = teach_df.fillna("").copy()
         self.room_df  = room_df.fillna("").copy()
@@ -54,48 +50,39 @@ class TimetableGenerator:
 
         self.labs = [str(r["room_id"]) for _, r in room_df.iterrows()
                      if str(r["room_type"]).lower() == "lab"]
-         # assign stable colors to subjects
+        
+        # assign stable colors to subjects
         sids = list(self.sub_map.keys())
         self.sub_color = {sid: SUBJECT_COLORS[i % len(SUBJECT_COLORS)] for i, sid in enumerate(sids)}
 
-
-def _empty_grid(self, class_ids):
+    def _empty_grid(self, class_ids):
         return {cid: {d: {s: None for s in SLOTS} for d in DAYS} for cid in class_ids}
 
-def _teacher_free(self, tb, tid, day, slot):
+    def _teacher_free(self, tb, tid, day, slot):
         return (tid, day, slot) not in tb
 
-def _room_free(self, rb, rid, day, slot):
+    def _room_free(self, rb, rid, day, slot):
         return (rid, day, slot) not in rb
 
-
-def _pick_teacher(self, tb, daily, sid, day, slot):
-
+    def _pick_teacher(self, tb, daily, sid, day, slot):
         candidates = list(self.sub2teach.get(sid, []))
         random.shuffle(candidates)
 
         for tid in candidates:
             t = self.teach_map.get(tid, {})
-
             maxd = int(t.get("max_hours_per_day", 5) or 5)
             avail = str(t.get("available_days","Mon,Tue,Wed,Thu,Fri"))
 
             if day[:3] not in avail:
                 continue
-
             if daily.get((tid, day), 0) >= maxd:
                 continue
-
             if not self._teacher_free(tb, tid, day, slot):
                 continue
-
             return tid
-
         return None
 
-
-def _pick_room(self, rb, sid, strength, day, slot):
-
+    def _pick_room(self, rb, sid, strength, day, slot):
         sub = self.sub_map.get(sid, {})
         is_lab = str(sub.get("requires_lab","false")).lower() == "true"
 
@@ -106,18 +93,15 @@ def _pick_room(self, rb, sid, strength, day, slot):
             r = self.room_map.get(rid, {})
             if int(r.get("capacity", 0) or 0) < str_n:
                 continue
-
             if self._room_free(rb, rid, day, slot):
                 return rid
-
         return None
 
-def _slot_order(self, credits):
+    def _slot_order(self, credits):
         c = int(credits or 3)
         return PRIME + AFTERNOON if c >= 4 else THEORY_SL
 
-
-def _make_entry(self, sid, tid, rid, stype, credits):
+    def _make_entry(self, sid, tid, rid, stype, credits):
         sub = self.sub_map.get(sid, {})
         t   = self.teach_map.get(tid, {})
         r   = self.room_map.get(rid, {})
@@ -133,13 +117,12 @@ def _make_entry(self, sid, tid, rid, stype, credits):
             "color":        self.sub_color.get(sid, "#6c63ff"),
         }
 
-def _schedule_group(self, class_ids):
+    def _schedule_group(self, class_ids):
         grid  = self._empty_grid(class_ids)
-        tb    = {}   # teacher busy: (tid, day, slot)
-        rb    = {}   # room busy:    (rid, day, slot)
-        daily = {}   # (tid, day) -> count
+        tb    = {}   
+        rb    = {}   
+        daily = {}   
 
-        # interleave A/B sections so both get fair access
         interleaved = []
         a = class_ids[::2]; b = class_ids[1::2]
         for i in range(max(len(a), len(b))):
@@ -159,12 +142,9 @@ def _schedule_group(self, class_ids):
                 else:
                     theory.append(sid)
 
-            # sort theory by credits desc → high-credit gets prime slots first
             theory.sort(key=lambda s: -int(self.sub_map.get(s,{}).get("credits",3) or 3))
-
             day_use = {d: 0 for d in DAYS}
 
-            # ── labs first (2-hr consecutive blocks) ──
             for sid in labs:
                 sub     = self.sub_map.get(sid, {})
                 lhrs    = int(sub.get("lab_hours_per_week", 2) or 2)
@@ -189,7 +169,6 @@ def _schedule_group(self, class_ids):
                             placed = True; break
                         if placed: break
 
-            # ── theory sessions ──
             for sid in theory:
                 sub     = self.sub_map.get(sid, {})
                 hrs     = int(sub.get("hours_per_week", 3) or 3)
@@ -213,9 +192,9 @@ def _schedule_group(self, class_ids):
                             day_use[day] += 1
                             placed = True; break
                         if placed: break
-
         return grid
-         def _class_score(self, cid, grid):
+
+    def _class_score(self, cid, grid):
         cls  = self.cls_map.get(cid, {})
         subs = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
         req  = 0
@@ -226,7 +205,8 @@ def _schedule_group(self, class_ids):
             req += int(sub.get("lab_hours_per_week",2) if is_lab else sub.get("hours_per_week",3) or 3)
         placed = sum(1 for d in DAYS for s in SLOTS if grid[cid][d][s])
         return placed / max(req, 1)
-def generate(self, iterations=60):
+
+    def generate(self, iterations=60):
         sem_groups = {}
         for _, cls in self.class_df.iterrows():
             sem = str(cls.get("semester","1"))
@@ -257,7 +237,8 @@ def generate(self, iterations=60):
 
         score = round(min(total_placed / max(total_req,1), 1.0) * 100, 1)
         return self._build_output(best_full_grid), score
-def _build_output(self, grid):
+
+    def _build_output(self, grid):
         return {
             "class":   self._class_view(grid),
             "teacher": self._teacher_view(grid),
@@ -281,7 +262,8 @@ def _build_output(self, grid):
                 "timetable":  tt,
             }
         return out
-def _teacher_view(self, grid):
+
+    def _teacher_view(self, grid):
         tgrid = {tid: {d: {s: None for s in SLOTS} for d in DAYS} for tid in self.teach_map}
         for cid in grid:
             cn = self.cls_map.get(cid,{}).get("class_name", cid)
@@ -308,6 +290,7 @@ def _teacher_view(self, grid):
                 "timetable":    tt,
             }
         return out
+
 def load_and_generate(sp, tp, rp, cp, iterations=60):
     s = pd.read_csv(sp); t = pd.read_csv(tp)
     r = pd.read_csv(rp); c = pd.read_csv(cp)
