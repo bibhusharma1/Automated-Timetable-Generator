@@ -1,3 +1,9 @@
+/* ================================================================
+   TimeForge v2 — app.js
+   Handles: CSV upload/parse, API calls, demo generation,
+            class timetable, teacher timetable, analysis, export
+   ================================================================ */
+
 const API = 'http://localhost:5000/api';
 
 /* ── State ─────────────────────────────────────────────────────── */
@@ -105,31 +111,34 @@ function splitCSVLine(line) {
   out.push(cur);
   return out.map(v => v.replace(/^"|"$/g,'').trim());
 }
+
 /* ── TOAST ──────────────────────────────────────────────────────── */
 function toast(msg, type='ok') {
   const el = document.createElement('div');
-  el.className = toast toast-${type};
+  el.className = `toast toast-${type}`;
   el.textContent = msg;
   document.getElementById('toastContainer').appendChild(el);
   setTimeout(() => el.remove(), 3800);
 }
+
 /* ── LOADER ─────────────────────────────────────────────────────── */
 let _loaderTimers = [];
 function showLoader() {
   document.getElementById('loader').classList.add('show');
-  for (let i=0;i<6;i++) document.getElementById(ls${i}).classList.remove('on');
+  for (let i=0;i<6;i++) document.getElementById(`ls${i}`).classList.remove('on');
   _loaderTimers.forEach(clearTimeout);
-  loaderTimers = Array.from({length:6},(,i)=>setTimeout(()=>document.getElementById(ls${i}).classList.add('on'), i*550));
+  _loaderTimers = Array.from({length:6},(_,i)=>setTimeout(()=>document.getElementById(`ls${i}`).classList.add('on'), i*550));
 }
 function hideLoader() {
   document.getElementById('loader').classList.remove('show');
   _loaderTimers.forEach(clearTimeout);
 }
+
 /* ── PROGRESS STEPS ─────────────────────────────────────────────── */
 function setStep(n, state) {
-  const el = document.getElementById(ps${n});
-  const ln = document.getElementById(pl${n});
-  el.className = prog-step ${state};
+  const el = document.getElementById(`ps${n}`);
+  const ln = document.getElementById(`pl${n}`);
+  el.className = `prog-step ${state}`;
   if (ln && state==='done') ln.classList.add('done');
 }
 
@@ -145,14 +154,14 @@ function handleFile(name, input) {
 
 function loadCSV(name, content, filename) {
   S.csv[name] = content;
-  document.getElementById(ta-${name}).value = content;
-  const dz = document.getElementById(dz-${name});
+  document.getElementById(`ta-${name}`).value = content;
+  const dz = document.getElementById(`dz-${name}`);
   dz.classList.add('filled');
-  document.getElementById(dzs-${name}).textContent = ✓ ${filename || name+'.csv'};
+  document.getElementById(`dzs-${name}`).textContent = `✓ ${filename || name+'.csv'}`;
 
   S.parsedCSV[name] = parseCSV(content);
   updatePreviewSection();
-  toast(${name}.csv loaded — ${S.parsedCSV[name].length} rows, 'ok');
+  toast(`${name}.csv loaded — ${S.parsedCSV[name].length} rows`, 'ok');
 }
 
 function updatePreviewSection() {
@@ -170,14 +179,15 @@ function showPreview(name, btn) {
   const cols = Object.keys(rows[0]);
   document.getElementById('previewTable').innerHTML = `
     <table>
-      <thead><tr>${cols.map(c=><th>${c}</th>).join('')}</tr></thead>
-      <tbody>${rows.slice(0,10).map(r=><tr>${cols.map(c=><td>${r[c]||''}</td>).join('')}</tr>).join('')}</tbody>
+      <thead><tr>${cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+      <tbody>${rows.slice(0,10).map(r=>`<tr>${cols.map(c=>`<td>${r[c]||''}</td>`).join('')}</tr>`).join('')}</tbody>
     </table>
-    ${rows.length>10?<p style="font-size:0.72rem;color:var(--muted);padding:6px 0">+${rows.length-10} more rows…</p>:''}`;
+    ${rows.length>10?`<p style="font-size:0.72rem;color:var(--muted);padding:6px 0">+${rows.length-10} more rows…</p>`:''}`;
 }
+
 /* ── SAMPLE DATA ────────────────────────────────────────────────── */
 function loadSample() {
-  Object.keys(SAMPLE).forEach(name => loadCSV(name, SAMPLE[name], ${name}.csv (sample)));
+  Object.keys(SAMPLE).forEach(name => loadCSV(name, SAMPLE[name], `${name}.csv (sample)`));
   toast('Sample CSE 3rd-year data loaded!', 'inf');
   setStep(1,'done'); setStep(2,'active');
 }
@@ -190,9 +200,9 @@ function showFormatGuide() {
 function clearAll() {
   Object.keys(S.csv).forEach(name => {
     S.csv[name] = '';
-    document.getElementById(ta-${name}).value = '';
-    document.getElementById(dz-${name}).classList.remove('filled');
-    document.getElementById(dzs-${name}).textContent = '';
+    document.getElementById(`ta-${name}`).value = '';
+    document.getElementById(`dz-${name}`).classList.remove('filled');
+    document.getElementById(`dzs-${name}`).textContent = '';
   });
   S.parsedCSV = {};
   document.getElementById('previewSection').style.display = 'none';
@@ -203,7 +213,7 @@ function clearAll() {
 /* ── SYNC TEXTAREAS → state ─────────────────────────────────────── */
 function syncTextareas() {
   Object.keys(S.csv).forEach(name => {
-    const v = document.getElementById(ta-${name}).value.trim();
+    const v = document.getElementById(`ta-${name}`).value.trim();
     if (v) { S.csv[name] = v; if (!S.parsedCSV[name]) S.parsedCSV[name] = parseCSV(v); }
   });
 }
@@ -212,7 +222,7 @@ function syncTextareas() {
 async function generate() {
   syncTextareas();
   const missing = Object.entries(S.csv).filter(([,v])=>!v).map(([k])=>k);
-  if (missing.length) { toast(Missing: ${missing.join(', ')}, 'err'); return; }
+  if (missing.length) { toast(`Missing: ${missing.join(', ')}`, 'err'); return; }
 
   showLoader();
   document.getElementById('statusPill').textContent = '● GENERATING';
@@ -220,13 +230,13 @@ async function generate() {
   setStep(2,'active');
 
   try {
-    const res = await fetch(${API}/generate, {
+    const res = await fetch(`${API}/generate`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ subjects:S.csv.subjects, teachers:S.csv.teachers, rooms:S.csv.rooms, classes:S.csv.classes })
     });
     const data = await res.json();
     hideLoader();
-    if (!res.ok || data.error) { toast(Error: ${data.error}, 'err'); return; }
+    if (!res.ok || data.error) { toast(`Error: ${data.error}`, 'err'); return; }
     applyResult(data.timetable, data.score, data.metadata);
   } catch {
     hideLoader();
@@ -240,13 +250,14 @@ function applyResult(timetable, score, metadata) {
   S.score     = score;
   S.meta      = metadata;
 
-  document.getElementById('statusPill').textContent = ● DONE — ${score}%;
+  document.getElementById('statusPill').textContent = `● DONE — ${score}%`;
   document.getElementById('statusPill').className = 'pill pill-green';
   setStep(2,'done'); setStep(3,'active');
 
   renderResults();
-  toast(✅ Timetable generated! Score: ${score}%, 'ok');
+  toast(`✅ Timetable generated! Score: ${score}%`, 'ok');
 }
+
 /* ── DEMO GENERATION (no backend) ──────────────────────────────── */
 function demoGenerate() {
   const subjects = parseCSV(S.csv.subjects);
@@ -377,6 +388,7 @@ function demoGenerate() {
 
 function shuffle(arr) { for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
 function sortedDays(use) { return [...DAYS].sort((a,b)=>(use[a]||0)-(use[b]||0)); }
+
 /* ── RENDER RESULTS ─────────────────────────────────────────────── */
 function renderResults() {
   document.getElementById('sec-results').style.display = 'block';
@@ -384,8 +396,8 @@ function renderResults() {
 
   // score banner
   setTimeout(()=>{
-    document.getElementById('scoreNum').textContent = ${S.score}%;
-    document.getElementById('scoreFill').style.width = ${S.score}%;
+    document.getElementById('scoreNum').textContent = `${S.score}%`;
+    document.getElementById('scoreFill').style.width = `${S.score}%`;
   }, 100);
 
   const classCount   = Object.keys(S.timetable.class).length;
@@ -403,13 +415,14 @@ function renderResults() {
   buildAnalysis();
   setStep(3,'done'); setStep(4,'active');
 }
+
 /* ── VIEW SWITCHING ─────────────────────────────────────────────── */
 function switchView(view) {
   S.currentView = view;
   document.querySelectorAll('.vsw').forEach(b=>b.classList.remove('active'));
-  document.getElementById(vsw-${view}).classList.add('active');
+  document.getElementById(`vsw-${view}`).classList.add('active');
   document.querySelectorAll('.view-panel').forEach(p=>p.classList.add('hidden'));
-  document.getElementById(vp-${view}).classList.remove('hidden');
+  document.getElementById(`vp-${view}`).classList.remove('hidden');
   if(view==='teacher') renderTeacherStats();
 }
 
@@ -422,6 +435,7 @@ function buildLegend() {
     <div class="legend-item"><div class="legend-dot" style="background:var(--bg3)"></div>Free Slot</div>
     <div class="legend-item">🟡 Credit score shown on each session</div>`;
 }
+
 /* ── CLASS BAR + TIMETABLE ──────────────────────────────────────── */
 function buildClassBar() {
   const ct = S.timetable.class;
@@ -435,12 +449,12 @@ function buildClassBar() {
 
   let html = '';
   Object.entries(semMap).sort((a,b)=>+a[0]-+b[0]).forEach(([sem, items]) => {
-    html += <div class="ebar-group"><span class="ebar-sem-label">Sem ${sem}</span>;
+    html += `<div class="ebar-group"><span class="ebar-sem-label">Sem ${sem}</span>`;
     items.forEach(({cid,cls}) => {
       const active = cid===S.currentClass ? ' active' : '';
-      html += <button class="ebar-btn${active}" onclick="selectClass('${cid}',this)">${cls.class_name}</button>;
+      html += `<button class="ebar-btn${active}" onclick="selectClass('${cid}',this)">${cls.class_name}</button>`;
     });
-    html += </div>;
+    html += `</div>`;
   });
   document.getElementById('classBar').innerHTML = html;
 
@@ -458,23 +472,23 @@ function selectClass(cid, btn) {
 function renderClassTT(cid) {
   const cls = S.timetable.class[cid];
   // header
-  document.getElementById('classTTHead').innerHTML = <tr><th>TIME SLOT</th>${DAYS.map(d=><th>${d}</th>).join('')}</tr>;
+  document.getElementById('classTTHead').innerHTML = `<tr><th>TIME SLOT</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr>`;
   // body
   document.getElementById('classTTBody').innerHTML = SLOTS.map(slot => {
     const td = DAYS.map(day => {
       const sdata = cls.timetable[day].find(s=>s.slot===slot);
-      return <td>${cellHTML(sdata)}</td>;
+      return `<td>${cellHTML(sdata)}</td>`;
     }).join('');
-    return <tr><td>${slot}</td>${td}</tr>;
+    return `<tr><td>${slot}</td>${td}</tr>`;
   }).join('');
 }
 
 function cellHTML(sdata) {
-  if (!sdata) return <div class="cell cell-free"></div>;
-  if (sdata.is_lunch) return <div class="cell cell-lunch"><div class="cell-lunch-text">☕ LUNCH</div></div>;
+  if (!sdata) return `<div class="cell cell-free"></div>`;
+  if (sdata.is_lunch) return `<div class="cell cell-lunch"><div class="cell-lunch-text">☕ LUNCH</div></div>`;
   const sess = sdata.session;
-  if (!sess) return <div class="cell cell-free"></div>;
-  if (sess.lab_continuation) return <div class="cell cell-lab continuation"><div class="cell-teacher" style="padding-top:20px;text-align:center;font-size:0.7rem">↑ Lab continues</div></div>;
+  if (!sess) return `<div class="cell cell-free"></div>`;
+  if (sess.lab_continuation) return `<div class="cell cell-lab continuation"><div class="cell-teacher" style="padding-top:20px;text-align:center;font-size:0.7rem">↑ Lab continues</div></div>`;
   const isLab = sess.type==='lab';
   const borderColor = sess.color || (isLab?'#00bfa5':'#3d5afe');
   return `<div class="cell cell-${sess.type}" style="border-top-color:${borderColor}">
@@ -493,7 +507,7 @@ function buildTeacherBar() {
   Object.entries(tt).forEach(([tid, tch]) => {
     const active = tid===S.currentTeacher ? ' active' : '';
     const hrs = tch.total_weekly;
-    html += <button class="ebar-btn${active}" onclick="selectTeacher('${tid}',this)" title="${tch.designation} — ${hrs} hrs/week">${tch.teacher_name.split(' ').slice(-1)[0]}<sup> ${hrs}h</sup></button>;
+    html += `<button class="ebar-btn${active}" onclick="selectTeacher('${tid}',this)" title="${tch.designation} — ${hrs} hrs/week">${tch.teacher_name.split(' ').slice(-1)[0]}<sup> ${hrs}h</sup></button>`;
   });
   document.getElementById('teacherBar').innerHTML = html;
   if (!S.currentTeacher) S.currentTeacher = Object.keys(tt)[0];
@@ -523,22 +537,22 @@ function selectTeacher(tid, btn) {
 
 function renderTeacherTT(tid) {
   const tch = S.timetable.teacher[tid];
-  document.getElementById('teacherTTHead').innerHTML = <tr><th>TIME SLOT</th>${DAYS.map(d=><th>${d}</th>).join('')}</tr>;
+  document.getElementById('teacherTTHead').innerHTML = `<tr><th>TIME SLOT</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr>`;
   document.getElementById('teacherTTBody').innerHTML = SLOTS.map(slot => {
     const td = DAYS.map(day => {
       const sdata = tch.timetable[day]?.find(s=>s.slot===slot);
-      return <td>${teacherCellHTML(sdata)}</td>;
+      return `<td>${teacherCellHTML(sdata)}</td>`;
     }).join('');
-    return <tr><td>${slot}</td>${td}</tr>;
+    return `<tr><td>${slot}</td>${td}</tr>`;
   }).join('');
 }
 
 function teacherCellHTML(sdata) {
-  if (!sdata) return <div class="cell cell-free"></div>;
-  if (sdata.is_lunch) return <div class="cell cell-lunch"><div class="cell-lunch-text">☕ LUNCH</div></div>;
+  if (!sdata) return `<div class="cell cell-free"></div>`;
+  if (sdata.is_lunch) return `<div class="cell cell-lunch"><div class="cell-lunch-text">☕ LUNCH</div></div>`;
   const sess = sdata.session;
-  if (!sess) return <div class="cell cell-free"></div>;
-  if (sess.lab_continuation) return <div class="cell cell-lab continuation"><div class="cell-teacher" style="padding-top:20px;text-align:center;font-size:0.7rem">↑ Lab</div></div>;
+  if (!sess) return `<div class="cell cell-free"></div>`;
+  if (sess.lab_continuation) return `<div class="cell cell-lab continuation"><div class="cell-teacher" style="padding-top:20px;text-align:center;font-size:0.7rem">↑ Lab</div></div>`;
   const isLab = sess.type==='lab';
   const borderColor = sess.color || (isLab?'#00bfa5':'#3d5afe');
   return `<div class="cell cell-${sess.type}" style="border-top-color:${borderColor}">
@@ -561,8 +575,8 @@ function buildAnalysis() {
     Object.entries(cls.timetable).forEach(([day,slots])=>{
       slots.forEach(s=>{
         const sess=s.session; if(!sess||sess.lab_continuation) return;
-        const key=${sess.teacher_id}|${day}|${s.slot};
-        if(teacherSlots[key]) conflicts.push(${sess.teacher_name} double-booked ${day} ${s.slot});
+        const key=`${sess.teacher_id}|${day}|${s.slot}`;
+        if(teacherSlots[key]) conflicts.push(`${sess.teacher_name} double-booked ${day} ${s.slot}`);
         teacherSlots[key]=cid;
       });
     });
@@ -571,8 +585,8 @@ function buildAnalysis() {
   document.getElementById('an-conflicts').innerHTML = `
     <div class="an-title"><div class="an-dot"></div>Conflict Report</div>
     ${conflictSet.length===0
-      ? <div class="conflict-ok">✅ No conflicts detected!</div>
-      : conflictSet.map(c=><div class="conflict-item">⚠ ${c}</div>).join('')}`;
+      ? `<div class="conflict-ok">✅ No conflicts detected!</div>`
+      : conflictSet.map(c=>`<div class="conflict-item">⚠ ${c}</div>`).join('')}`;
 
   // subject frequency
   const subFreq = {};
@@ -588,7 +602,7 @@ function buildAnalysis() {
         <div class="bar-lbl" title="${n}">${n}</div>
         <div class="bar-bg"><div class="bar-fill" style="width:${c/maxF*100}%;background:linear-gradient(90deg,var(--violet),var(--cyan))"></div></div>
         <div class="bar-val">${c}</div>
-      </div>).join('')}</div>;
+      </div>`).join('')}</div>`;
 
   // teacher load
   const loads = Object.values(tt).map(t=>({name:t.teacher_name, hrs:t.total_weekly, desig:t.designation})).sort((a,b)=>b.hrs-a.hrs);
@@ -663,9 +677,9 @@ function exportCSV(view) {
     });
   }
 
-  const csv = rows.map(r=>r.map(v=>"${v}").join(',')).join('\n');
-  dlBlob(new Blob([csv],{type:'text/csv'}), timetable_${view}.csv);
-  toast(${view} CSV downloaded, 'ok');
+  const csv = rows.map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  dlBlob(new Blob([csv],{type:'text/csv'}), `timetable_${view}.csv`);
+  toast(`${view} CSV downloaded`, 'ok');
   setStep(4,'done');
 }
 
@@ -693,7 +707,7 @@ function printView() {
       if(!sess) return '<td style="color:#999">Free</td>';
       if(sess.lab_continuation) return '<td style="background:#e8f5e9;color:#888">↑ Lab cont.</td>';
       const bg=sess.type==='lab'?'#e0f2f1':'#e8eaf6';
-      return <td style="background:${bg}"><b>${sess.subject_name}</b><br><small>${sess.teacher_name}</small><br><small>${sess.room_name}</small><br><small>Credits: ${sess.credits}</small></td>;
+      return `<td style="background:${bg}"><b>${sess.subject_name}</b><br><small>${sess.teacher_name}</small><br><small>${sess.room_name}</small><br><small>Credits: ${sess.credits}</small></td>`;
     }).join('')}
   </tr>`).join('');
   win.document.write(`<!DOCTYPE html><html><head><title>${cls.class_name}</title>
@@ -701,7 +715,7 @@ function printView() {
     table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;font-size:11px;text-align:center}
     th{background:#3d5afe;color:white}</style></head><body>
     <h1>${cls.class_name} — Weekly Timetable (Year ${cls.year}, Semester ${cls.semester}) | Score: ${S.score}%</h1>
-    <table><thead><tr><th>Time</th>${DAYS.map(d=><th>${d}</th>).join('')}</tr></thead>
+    <table><thead><tr><th>Time</th>${DAYS.map(d=>`<th>${d}</th>`).join('')}</tr></thead>
     <tbody>${rows}</tbody></table></body></html>`);
   win.print();
 }
