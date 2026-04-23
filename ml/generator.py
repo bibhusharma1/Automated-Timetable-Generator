@@ -226,3 +226,34 @@ def _schedule_group(self, class_ids):
             req += int(sub.get("lab_hours_per_week",2) if is_lab else sub.get("hours_per_week",3) or 3)
         placed = sum(1 for d in DAYS for s in SLOTS if grid[cid][d][s])
         return placed / max(req, 1)
+def generate(self, iterations=60):
+        sem_groups = {}
+        for _, cls in self.class_df.iterrows():
+            sem = str(cls.get("semester","1"))
+            sem_groups.setdefault(sem, []).append(str(cls["class_id"]))
+
+        best_full_grid  = {}
+        total_req = total_placed = 0
+
+        for sem, cids in sem_groups.items():
+            best_g, best_s = None, -1
+            for _ in range(iterations):
+                g = self._schedule_group(cids)
+                s = sum(self._class_score(c, g) for c in cids) / len(cids)
+                if s > best_s:
+                    best_s = s; best_g = copy.deepcopy(g)
+                if best_s >= 0.92: break
+            best_full_grid.update(best_g)
+
+        for cid in best_full_grid:
+            cls  = self.cls_map.get(cid, {})
+            subs = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
+            for sid in subs:
+                sub = self.sub_map.get(sid, {})
+                if not sub: continue
+                is_lab = str(sub.get("requires_lab","false")).lower() == "true"
+                total_req += int(sub.get("lab_hours_per_week",2) if is_lab else sub.get("hours_per_week",3) or 3)
+            total_placed += sum(1 for d in DAYS for s in SLOTS if best_full_grid[cid][d][s])
+
+        score = round(min(total_placed / max(total_req,1), 1.0) * 100, 1)
+        return self._build_output(best_full_grid), score
