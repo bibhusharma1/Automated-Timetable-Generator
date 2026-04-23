@@ -247,3 +247,133 @@ function applyResult(timetable, score, metadata) {
   renderResults();
   toast(✅ Timetable generated! Score: ${score}%, 'ok');
 }
+/* ── DEMO GENERATION (no backend) ──────────────────────────────── */
+function demoGenerate() {
+  const subjects = parseCSV(S.csv.subjects);
+  const teachers = parseCSV(S.csv.teachers);
+  const rooms    = parseCSV(S.csv.rooms);
+  const classes  = parseCSV(S.csv.classes);
+
+  const subMap = Object.fromEntries(subjects.map(s=>[s.subject_id, s]));
+  const sub2teach = {};
+  teachers.forEach(t => {
+    (t.subjects||'').split(',').forEach(s => {
+      s=s.trim(); if(s) { sub2teach[s]=sub2teach[s]||[]; sub2teach[s].push(t); }
+    });
+  });
+  const classrooms = rooms.filter(r=>r.room_type==='classroom');
+  const labs       = rooms.filter(r=>r.room_type==='lab');
+
+  // color palette
+  const COLORS=['#6c63ff','#ff6b6b','#43e97b','#f7971e','#38d9f9','#e040fb','#00e676','#ff9100','#40c4ff','#ea80fc'];
+  const subColor = {};
+  subjects.forEach((s,i)=>{ subColor[s.subject_id]=COLORS[i%COLORS.length]; });
+
+  // group by semester
+  const semGroups = {};
+  classes.forEach(c=>{ const sem=c.semester||'1'; semGroups[sem]=semGroups[sem]||[]; semGroups[sem].push(c); });
+
+  const classView={}, teacherGrid={};
+  teachers.forEach(t=>{ teacherGrid[t.teacher_id]={teacher_name:t.teacher_name, designation:t.designation||'Faculty', total_weekly:0, timetable:{}}; DAYS.forEach(d=>{ teacherGrid[t.teacher_id].timetable[d]=[]; SLOTS.forEach(s=>teacherGrid[t.teacher_id].timetable[d].push({slot:s,is_lunch:s===LUNCH,session:null})); }); });
+
+  Object.entries(semGroups).forEach(([sem, semClasses]) => {
+    const tb={}, rb={}, daily={};
+    semClasses.forEach(cls => {
+      const cid=cls.class_id, strength=parseInt(cls.strength||60);
+      const subs=(cls.subjects||'').split(',').map(s=>s.trim()).filter(Boolean);
+      const theory=[], labList=[];
+      subs.forEach(sid=>{ const sub=subMap[sid]; if(!sub) return; (sub.requires_lab==='true'?labList:theory).push(sid); });
+      theory.sort((a,b)=>-parseInt(subMap[a]?.credits||3)+parseInt(subMap[b]?.credits||3));
+
+      const grid={}; DAYS.forEach(d=>{ grid[d]={}; SLOTS.forEach(s=>grid[d][s]=null); });
+      const dayUse={};DAYS.forEach(d=>dayUse[d]=0);
+
+      function pickTeacher(sid,day,slot) {
+        for(const t of shuffle([...(sub2teach[sid]||[])])) {
+          const tid=t.teacher_id, maxD=parseInt(t.max_hours_per_day||5);
+          if((daily[tid+'|'+day]||0)>=maxD) continue;
+          if(tb[tid+'|'+day+'|'+slot]) continue;
+          return t;
+        }
+        return null;
+      }
+      function pickRoom(sid,day,slot) {
+        const isLab=subMap[sid]?.requires_lab==='true';
+        for(const r of shuffle([...(isLab?labs:classrooms)])) {
+          if(parseInt(r.capacity||0)<strength) continue;
+          if(rb[r.room_id+'|'+day+'|'+slot]) continue;
+          return r;
+        }
+        return null;
+      }
+      function markT(t,day,slot,n=1){tb[t.teacher_id+'|'+day+'|'+slot]=true; daily[t.teacher_id+'|'+day]=(daily[t.teacher_id+'|'+day]||0)+n;}
+      function markR(r,day,slot){rb[r.room_id+'|'+day+'|'+slot]=true;}
+      function makeEntry(sid,t,r,type,credits){
+        const sub=subMap[sid]||{};
+        return {subject_id:sid, subject_name:sub.subject_name||sid, teacher_id:t.teacher_id, teacher_name:t.teacher_name, room_id:r.room_id, room_name:r.room_name, type, credits:parseInt(credits||3), color:subColor[sid]||'#6c63ff'};
+      }
+
+      // labs
+      labList.forEach(sid=>{
+        const sub=subMap[sid]||{}, lhrs=parseInt(sub.lab_hours_per_week||2), crd=sub.credits||2;
+        for(let b=0;b<Math.max(Math.floor(lhrs/2),1);b++){
+          let placed=false;
+          for(const day of sortedDays(dayUse)){
+            for(const [s1,s2] of shuffle([...LAB_PAIRS])){
+              if(grid[day][s1]||grid[day][s2]) continue;
+              const t=pickTeacher(sid,day,s1); if(!t||tb[t.teacher_id+'|'+day+'|'+s2]) continue;
+              const r=pickRoom(sid,day,s1); if(!r||rb[r.room_id+'|'+day+'|'+s2]) continue;
+              const entry=makeEntry(sid,t,r,'lab',crd);
+              grid[day][s1]=entry; grid[day][s2]={...entry,lab_continuation:true};
+              markT(t,day,s1); markT(t,day,s2); markR(r,day,s1); markR(r,day,s2);
+              dayUse[day]+=2; placed=true; break;
+            }
+            if(placed) break;
+          }
+        }
+      });
+
+      // theory
+      theory.forEach(sid=>{
+        const sub=subMap[sid]||{}, hrs=parseInt(sub.hours_per_week||3), crd=sub.credits||3;
+        const slotOrder=parseInt(crd)>=4?[...PRIME,...AFTERNOON]:[...SLOTS.filter(s=>s!==LUNCH)];
+        for(let h=0;h<hrs;h++){
+          let placed=false;
+          for(const day of sortedDays(dayUse)){
+            for(const slot of slotOrder){
+              if(slot===LUNCH||grid[day][slot]) continue;
+              const t=pickTeacher(sid,day,slot); if(!t) continue;
+              const r=pickRoom(sid,day,slot); if(!r) continue;
+              grid[day][slot]=makeEntry(sid,t,r,'theory',crd);
+              markT(t,day,slot); markR(r,day,slot); dayUse[day]++;
+              placed=true; break;
+            }
+            if(placed) break;
+          }
+        }
+      });
+
+      classView[cid]={ class_name:cls.class_name, year:cls.year||'', semester:cls.semester||'', timetable:{} };
+      DAYS.forEach(day=>{
+        classView[cid].timetable[day]=SLOTS.map(slot=>({slot,is_lunch:slot===LUNCH,session:grid[day][slot]}));
+        SLOTS.forEach(slot=>{
+          const sess=grid[day][slot];
+          if(sess){ const tid=sess.teacher_id; if(tid&&teacherGrid[tid]){ const sl=teacherGrid[tid].timetable[day].find(x=>x.slot===slot); if(sl&&!sl.session) sl.session={...sess,class_id:cid,class_name:cls.class_name}; teacherGrid[tid].total_weekly++; }}
+        });
+      });
+    });
+  });
+
+  teachers.forEach(t=>{ if(teacherGrid[t.teacher_id]) teacherGrid[t.teacher_id].total_weekly=Math.floor(teacherGrid[t.teacher_id].total_weekly); });
+
+  // score
+  let req=0, placed=0;
+  classes.forEach(cls=>{ (cls.subjects||'').split(',').forEach(sid=>{ sid=sid.trim(); const sub=subMap[sid]; if(!sub) return; const isLab=sub.requires_lab==='true'; req+=parseInt(isLab?sub.lab_hours_per_week:sub.hours_per_week||3); }); });
+  Object.values(classView).forEach(cv=>{ Object.values(cv.timetable).forEach(day=>day.forEach(s=>{ if(s.session) placed++; })); });
+  const score=Math.round(Math.min(placed/Math.max(req,1),1)*1000)/10;
+
+  applyResult({class:classView, teacher:teacherGrid}, score, {subjects:parseCSV(S.csv.subjects), teachers:parseCSV(S.csv.teachers), rooms:parseCSV(S.csv.rooms), classes:parseCSV(S.csv.classes)});
+}
+
+function shuffle(arr) { for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function sortedDays(use) { return [...DAYS].sort((a,b)=>(use[a]||0)-(use[b]||0)); }
