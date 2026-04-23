@@ -393,3 +393,43 @@ textarea:focus { outline: none; border-color: var(--violet); }
 .credit-badge { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
 .credit-num { font-size: 1.6rem; font-weight: 700; color: var(--violet); }
 .credit-lbl { font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; }
+
+
+/* ── EXPORT ROW ─────────────────────────────────────────────────── */
+.export-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 0; border-top: 1px solid var(--border); margin-top: 28px; flex-wrap: wrap;
+}
+.export-label { font-size: 0.78rem; color: var(--muted); font-family: 'Fira Code', monospace; }
+
+/* ── TOAST ──────────────────────────────────────────────────────── */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 500; display: flex; flex-direction: column; gap: 8px; }
+.toast {
+  padding: 12px 18px; border-radius: 10px; font-size: 0.83rem; font-weight: 600;
+  animation: slideIn 0.3s ease; pointer-events: none; min-width: 220px;
+}
+@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.toast-ok  { background: rgba(6,214,160,0.15);  border: 1px solid var(--cyan); color: var(--cyan2); }
+.toast-err { background: rgba(255,107,138,0.15); border: 1px solid var(--rose); color: var(--rose); }
+.toast-inf { background: rgba(245,166,35,0.15);  border: 1px solid var(--amber); color: var(--amber2); }
+
+/* ── RESPONSIVE ─────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .drop-grid    { grid-template-columns: 1fr 1fr; }
+  .score-stats  { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 800px) {
+  header, .progress-bar, main { padding-left: 20px; padding-right: 20px; }
+  .drop-grid    { grid-template-columns: 1fr 1fr; }
+  .fg-grid      { grid-template-columns: 1fr; }
+  .paste-grid   { grid-template-columns: 1fr; }
+  .analysis-grid{ grid-template-columns: 1fr; }
+  .an-card.wide { grid-column: auto; }
+  .score-banner { flex-direction: column; }
+  .score-stats  { grid-template-columns: 1fr 1fr; }
+  .view-switcher{ flex-wrap: wrap; }
+}
+@media (max-width: 500px) {
+  .drop-grid   { grid-template-columns: 1fr; }
+  .score-stats { grid-template-columns: 1fr; }
+}
