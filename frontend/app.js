@@ -175,3 +175,75 @@ function showPreview(name, btn) {
     </table>
     ${rows.length>10?<p style="font-size:0.72rem;color:var(--muted);padding:6px 0">+${rows.length-10} more rows…</p>:''}`;
 }
+/* ── SAMPLE DATA ────────────────────────────────────────────────── */
+function loadSample() {
+  Object.keys(SAMPLE).forEach(name => loadCSV(name, SAMPLE[name], ${name}.csv (sample)));
+  toast('Sample CSE 3rd-year data loaded!', 'inf');
+  setStep(1,'done'); setStep(2,'active');
+}
+
+function showFormatGuide() {
+  const g = document.getElementById('formatGuide');
+  g.style.display = g.style.display==='none' ? 'block' : 'none';
+}
+
+function clearAll() {
+  Object.keys(S.csv).forEach(name => {
+    S.csv[name] = '';
+    document.getElementById(ta-${name}).value = '';
+    document.getElementById(dz-${name}).classList.remove('filled');
+    document.getElementById(dzs-${name}).textContent = '';
+  });
+  S.parsedCSV = {};
+  document.getElementById('previewSection').style.display = 'none';
+  setStep(1,'active'); setStep(2,''); setStep(3,''); setStep(4,'');
+  toast('Cleared', 'err');
+}
+
+/* ── SYNC TEXTAREAS → state ─────────────────────────────────────── */
+function syncTextareas() {
+  Object.keys(S.csv).forEach(name => {
+    const v = document.getElementById(ta-${name}).value.trim();
+    if (v) { S.csv[name] = v; if (!S.parsedCSV[name]) S.parsedCSV[name] = parseCSV(v); }
+  });
+}
+
+/* ── GENERATE ───────────────────────────────────────────────────── */
+async function generate() {
+  syncTextareas();
+  const missing = Object.entries(S.csv).filter(([,v])=>!v).map(([k])=>k);
+  if (missing.length) { toast(Missing: ${missing.join(', ')}, 'err'); return; }
+
+  showLoader();
+  document.getElementById('statusPill').textContent = '● GENERATING';
+  document.getElementById('statusPill').className = 'pill pill-amber';
+  setStep(2,'active');
+
+  try {
+    const res = await fetch(${API}/generate, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ subjects:S.csv.subjects, teachers:S.csv.teachers, rooms:S.csv.rooms, classes:S.csv.classes })
+    });
+    const data = await res.json();
+    hideLoader();
+    if (!res.ok || data.error) { toast(Error: ${data.error}, 'err'); return; }
+    applyResult(data.timetable, data.score, data.metadata);
+  } catch {
+    hideLoader();
+    // demo mode
+    demoGenerate();
+  }
+}
+
+function applyResult(timetable, score, metadata) {
+  S.timetable = timetable;
+  S.score     = score;
+  S.meta      = metadata;
+
+  document.getElementById('statusPill').textContent = ● DONE — ${score}%;
+  document.getElementById('statusPill').className = 'pill pill-green';
+  setStep(2,'done'); setStep(3,'active');
+
+  renderResults();
+  toast(✅ Timetable generated! Score: ${score}%, 'ok');
+}
