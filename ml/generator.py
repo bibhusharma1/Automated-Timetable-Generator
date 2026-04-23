@@ -1,3 +1,11 @@
+"""
+TimeForge v2 - Credit-Weighted Timetable Generator
+- Schedules one semester at a time (realistic, no cross-semester conflicts)
+- Credit-weighted slot priority (high credits → prime morning slots)
+- Labs placed as consecutive 2-hour blocks
+- Teacher & room double-booking prevented within each semester
+- Three output views: class, teacher
+"""
 import pandas as pd
 import random
 import copy
@@ -5,17 +13,14 @@ import copy
 DAYS  = ["Monday","Tuesday","Wednesday","Thursday","Friday"]
 SLOTS = ["8:00-9:00","9:00-10:00","10:00-11:00","11:00-12:00",
          "12:00-1:00","1:00-2:00","2:00-3:00","3:00-4:00"]
-
 LUNCH      = "12:00-1:00"
 THEORY_SL  = [s for s in SLOTS if s != LUNCH]
-
 LAB_PAIRS  = [
     ("8:00-9:00","9:00-10:00"),
     ("9:00-10:00","10:00-11:00"),
     ("1:00-2:00","2:00-3:00"),
     ("2:00-3:00","3:00-4:00"),
 ]
-
 PRIME     = ["8:00-9:00","9:00-10:00","10:00-11:00","11:00-12:00"]
 AFTERNOON = ["1:00-2:00","2:00-3:00","3:00-4:00"]
 
@@ -38,6 +43,7 @@ class TimetableGenerator:
         self.room_map  = {str(r["room_id"]):    dict(r) for _, r in room_df.iterrows()}
         self.cls_map   = {str(r["class_id"]):   dict(r) for _, r in class_df.iterrows()}
 
+        # subject_id -> [teacher_ids]
         self.sub2teach = {}
         for _, t in teach_df.iterrows():
             for s in str(t["subjects"]).split(","):
@@ -47,14 +53,14 @@ class TimetableGenerator:
 
         self.classrooms = [str(r["room_id"]) for _, r in room_df.iterrows()
                            if str(r["room_type"]).lower() == "classroom"]
+        self.labs       = [str(r["room_id"]) for _, r in room_df.iterrows()
+                           if str(r["room_type"]).lower() == "lab"]
 
-        self.labs = [str(r["room_id"]) for _, r in room_df.iterrows()
-                     if str(r["room_type"]).lower() == "lab"]
-        
         # assign stable colors to subjects
         sids = list(self.sub_map.keys())
         self.sub_color = {sid: SUBJECT_COLORS[i % len(SUBJECT_COLORS)] for i, sid in enumerate(sids)}
 
+    # ─── grid helpers ────────────────────────────────────────────────────────
     def _empty_grid(self, class_ids):
         return {cid: {d: {s: None for s in SLOTS} for d in DAYS} for cid in class_ids}
 
@@ -64,37 +70,33 @@ class TimetableGenerator:
     def _room_free(self, rb, rid, day, slot):
         return (rid, day, slot) not in rb
 
+    # ─── pick helpers ────────────────────────────────────────────────────────
     def _pick_teacher(self, tb, daily, sid, day, slot):
         candidates = list(self.sub2teach.get(sid, []))
         random.shuffle(candidates)
-
         for tid in candidates:
-            t = self.teach_map.get(tid, {})
+            t    = self.teach_map.get(tid, {})
             maxd = int(t.get("max_hours_per_day", 5) or 5)
             avail = str(t.get("available_days","Mon,Tue,Wed,Thu,Fri"))
-
-            if day[:3] not in avail:
-                continue
-            if daily.get((tid, day), 0) >= maxd:
-                continue
-            if not self._teacher_free(tb, tid, day, slot):
-                continue
+            if day[:3] not in avail: continue
+            if daily.get((tid, day), 0) >= maxd: continue
+            if not self._teacher_free(tb, tid, day, slot): continue
             return tid
         return None
 
     def _pick_room(self, rb, sid, strength, day, slot):
-        sub = self.sub_map.get(sid, {})
+        sub    = self.sub_map.get(sid, {})
         is_lab = str(sub.get("requires_lab","false")).lower() == "true"
-
-        pool = self.labs if is_lab else self.classrooms
+        pool   = self.labs if is_lab else self.classrooms
         random.shuffle(pool)
         str_n  = int(strength or 0)
         for rid in pool:
             r = self.room_map.get(rid, {})
-            if int(r.get("capacity", 0) or 0) < str_n:
-                continue
-            if self._room_free(rb, rid, day, slot):
-                return rid
+            if int(r.get("capacity", 0) or 0) < str_n: continue
+            if self._room_free(rb, rid, day, slot): return rid
+        # fallback ignoring capacity
+        for rid in pool:
+            if self._room_free(rb, rid, day, slot): return rid
         return None
 
     def _slot_order(self, credits):
@@ -117,12 +119,14 @@ class TimetableGenerator:
             "color":        self.sub_color.get(sid, "#6c63ff"),
         }
 
+    # ─── schedule one semester group ─────────────────────────────────────────
     def _schedule_group(self, class_ids):
         grid  = self._empty_grid(class_ids)
-        tb    = {}   
-        rb    = {}   
-        daily = {}   
+        tb    = {}   # teacher busy: (tid, day, slot)
+        rb    = {}   # room busy:    (rid, day, slot)
+        daily = {}   # (tid, day) -> count
 
+        # interleave A/B sections so both get fair access
         interleaved = []
         a = class_ids[::2]; b = class_ids[1::2]
         for i in range(max(len(a), len(b))):
@@ -142,9 +146,12 @@ class TimetableGenerator:
                 else:
                     theory.append(sid)
 
+            # sort theory by credits desc → high-credit gets prime slots first
             theory.sort(key=lambda s: -int(self.sub_map.get(s,{}).get("credits",3) or 3))
+
             day_use = {d: 0 for d in DAYS}
 
+            # ── labs first (2-hr consecutive blocks) ──
             for sid in labs:
                 sub     = self.sub_map.get(sid, {})
                 lhrs    = int(sub.get("lab_hours_per_week", 2) or 2)
@@ -169,6 +176,7 @@ class TimetableGenerator:
                             placed = True; break
                         if placed: break
 
+            # ── theory sessions ──
             for sid in theory:
                 sub     = self.sub_map.get(sid, {})
                 hrs     = int(sub.get("hours_per_week", 3) or 3)
@@ -192,8 +200,10 @@ class TimetableGenerator:
                             day_use[day] += 1
                             placed = True; break
                         if placed: break
+
         return grid
 
+    # ─── fitness per class ───────────────────────────────────────────────────
     def _class_score(self, cid, grid):
         cls  = self.cls_map.get(cid, {})
         subs = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
@@ -206,7 +216,9 @@ class TimetableGenerator:
         placed = sum(1 for d in DAYS for s in SLOTS if grid[cid][d][s])
         return placed / max(req, 1)
 
+    # ─── public ──────────────────────────────────────────────────────────────
     def generate(self, iterations=60):
+        # group classes by semester
         sem_groups = {}
         for _, cls in self.class_df.iterrows():
             sem = str(cls.get("semester","1"))
@@ -225,6 +237,7 @@ class TimetableGenerator:
                 if best_s >= 0.92: break
             best_full_grid.update(best_g)
 
+        # overall score
         for cid in best_full_grid:
             cls  = self.cls_map.get(cid, {})
             subs = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
@@ -238,6 +251,7 @@ class TimetableGenerator:
         score = round(min(total_placed / max(total_req,1), 1.0) * 100, 1)
         return self._build_output(best_full_grid), score
 
+    # ─── output builders ─────────────────────────────────────────────────────
     def _build_output(self, grid):
         return {
             "class":   self._class_view(grid),
@@ -290,6 +304,7 @@ class TimetableGenerator:
                 "timetable":    tt,
             }
         return out
+
 
 def load_and_generate(sp, tp, rp, cp, iterations=60):
     s = pd.read_csv(sp); t = pd.read_csv(tp)
