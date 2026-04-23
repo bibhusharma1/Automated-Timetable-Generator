@@ -242,3 +242,70 @@ textarea:focus { outline: none; border-color: var(--violet); }
 .btn-outline  { background: transparent; color: var(--text); border: 1px solid var(--border2); }
 .btn-outline:hover { border-color: var(--amber); color: var(--amber); }
 .btn-sm { padding: 7px 16px; font-size: 0.8rem; }
+
+/* ── SCORE BANNER ───────────────────────────────────────────────── */
+.score-banner {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px 32px; margin-bottom: 28px;
+  flex-wrap: wrap; gap: 20px;
+}
+.score-left { display: flex; flex-direction: column; gap: 6px; min-width: 200px; }
+.score-num  { font-size: 3rem; font-weight: 700; color: var(--cyan); letter-spacing: -2px; line-height: 1; }
+.score-label { font-size: 0.78rem; color: var(--muted); font-family: 'Fira Code', monospace; }
+.score-bar-wrap { background: var(--bg3); border-radius: 999px; height: 6px; width: 240px; overflow: hidden; margin-top: 4px; }
+.score-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--cyan)); transition: width 1.2s ease; }
+
+.score-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.sstat { background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }
+.sstat-val  { font-size: 1.8rem; font-weight: 700; color: var(--amber); line-height: 1; }
+.sstat-lbl  { font-size: 0.72rem; color: var(--muted); font-family: 'Fira Code', monospace; margin-top: 2px; }
+
+/* ── VIEW SWITCHER ──────────────────────────────────────────────── */
+.view-switcher { display: flex; gap: 6px; margin-bottom: 20px; background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 5px; width: fit-content; }
+.vsw {
+  padding: 8px 22px; border-radius: 8px; border: none;
+  background: transparent; color: var(--muted);
+  font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.vsw.active { background: var(--bg3); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+.vsw:hover:not(.active) { color: var(--text); }
+
+/* ── VIEW PANELS ────────────────────────────────────────────────── */
+.view-panel { animation: fadeUp 0.3s ease both; }
+.view-panel.hidden { display: none; }
+
+/* ── ENTITY BAR (class/teacher selector) ───────────────────────── */
+.entity-bar {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.ebar-btn {
+  padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--bg2); color: var(--muted);
+  font-family: 'Space Grotesk', sans-serif; font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; transition: all 0.15s;
+}
+.ebar-btn.active { background: var(--amber); color: #08090d; border-color: var(--amber); }
+.ebar-btn:hover:not(.active) { color: var(--text); border-color: var(--muted); }
+
+/* semester group labels */
+.ebar-group { display: flex; align-items: center; gap: 6px; margin-right: 4px; }
+.ebar-sem-label { font-size: 0.68rem; color: var(--muted); font-family: 'Fira Code', monospace; white-space: nowrap; }
+
+/* ── LEGEND ─────────────────────────────────────────────────────── */
+.tt-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--muted); }
+.legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+/* ── TEACHER STATS ──────────────────────────────────────────────── */
+.teacher-stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.tstat-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 18px; display: flex; flex-direction: column; gap: 2px; min-width: 160px;
+}
+.tstat-name { font-weight: 700; font-size: 0.85rem; }
+.tstat-desig { font-size: 0.72rem; color: var(--muted); font-family: 'Fira Code', monospace; }
+.tstat-hrs  { font-size: 1.4rem; font-weight: 700; color: var(--amber); }
+.tstat-sub  { font-size: 0.7rem; color: var(--muted); }
+
