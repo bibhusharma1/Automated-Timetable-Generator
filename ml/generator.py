@@ -281,3 +281,30 @@ def _build_output(self, grid):
                 "timetable":  tt,
             }
         return out
+def _teacher_view(self, grid):
+        tgrid = {tid: {d: {s: None for s in SLOTS} for d in DAYS} for tid in self.teach_map}
+        for cid in grid:
+            cn = self.cls_map.get(cid,{}).get("class_name", cid)
+            for day in DAYS:
+                for slot in SLOTS:
+                    sess = grid[cid][day][slot]
+                    if sess:
+                        tid = sess.get("teacher_id")
+                        if tid and tid in tgrid:
+                            if tgrid[tid][day][slot] is None:
+                                tgrid[tid][day][slot] = {**sess, "class_id": cid, "class_name": cn}
+        out = {}
+        for tid, t in self.teach_map.items():
+            tt = {}
+            for day in DAYS:
+                tt[day] = []
+                for slot in SLOTS:
+                    tt[day].append({"slot": slot, "is_lunch": slot==LUNCH, "session": tgrid[tid][day][slot]})
+            total = sum(1 for d in DAYS for s in SLOTS if tgrid[tid][d][s])
+            out[tid] = {
+                "teacher_name": t["teacher_name"],
+                "designation":  t.get("designation","Faculty"),
+                "total_weekly": total,
+                "timetable":    tt,
+            }
+        return out
