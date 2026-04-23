@@ -19,7 +19,12 @@ LAB_PAIRS  = [
 PRIME     = ["8:00-9:00","9:00-10:00","10:00-11:00","11:00-12:00"]
 AFTERNOON = ["1:00-2:00","2:00-3:00","3:00-4:00"]
 
-
+# ── colour palette for subjects (frontend use) ──────────────────────────────
+SUBJECT_COLORS = [
+    "#6c63ff","#ff6b6b","#43e97b","#f7971e","#38d9f9",
+    "#e040fb","#00e676","#ff9100","#40c4ff","#ea80fc",
+    "#69f0ae","#ffff00","#ff6e40","#18ffff","#b9f6ca",
+]
 
 
 
@@ -49,16 +54,18 @@ class TimetableGenerator:
 
         self.labs = [str(r["room_id"]) for _, r in room_df.iterrows()
                      if str(r["room_type"]).lower() == "lab"]
-        
+         # assign stable colors to subjects
+        sids = list(self.sub_map.keys())
+        self.sub_color = {sid: SUBJECT_COLORS[i % len(SUBJECT_COLORS)] for i, sid in enumerate(sids)}
 
 
 def _empty_grid(self, class_ids):
         return {cid: {d: {s: None for s in SLOTS} for d in DAYS} for cid in class_ids}
 
-    def _teacher_free(self, tb, tid, day, slot):
+def _teacher_free(self, tb, tid, day, slot):
         return (tid, day, slot) not in tb
 
-    def _room_free(self, rb, rid, day, slot):
+def _room_free(self, rb, rid, day, slot):
         return (rid, day, slot) not in rb
 
 
@@ -87,17 +94,17 @@ def _pick_teacher(self, tb, daily, sid, day, slot):
         return None
 
 
-    def _pick_room(self, rb, sid, strength, day, slot):
+def _pick_room(self, rb, sid, strength, day, slot):
 
         sub = self.sub_map.get(sid, {})
         is_lab = str(sub.get("requires_lab","false")).lower() == "true"
 
         pool = self.labs if is_lab else self.classrooms
         random.shuffle(pool)
-
+        str_n  = int(strength or 0)
         for rid in pool:
             r = self.room_map.get(rid, {})
-            if int(r.get("capacity", 0) or 0) < int(strength or 0):
+            if int(r.get("capacity", 0) or 0) < str_n:
                 continue
 
             if self._room_free(rb, rid, day, slot):
@@ -110,14 +117,20 @@ def _slot_order(self, credits):
         return PRIME + AFTERNOON if c >= 4 else THEORY_SL
 
 
-    def _make_entry(self, sid, tid, rid, stype, credits):
-
+def _make_entry(self, sid, tid, rid, stype, credits):
+        sub = self.sub_map.get(sid, {})
+        t   = self.teach_map.get(tid, {})
+        r   = self.room_map.get(rid, {})
         return {
-            "subject_id": sid,
-            "teacher_id": tid,
-            "room_id": rid,
-            "type": stype,
-            "credits": int(credits or 3)
+            "subject_id":   sid,
+            "subject_name": sub.get("subject_name", sid),
+            "teacher_id":   tid,
+            "teacher_name": t.get("teacher_name", tid),
+            "room_id":      rid,
+            "room_name":    r.get("room_name", rid),
+            "type":         stype,
+            "credits":      int(credits or 3),
+            "color":        self.sub_color.get(sid, "#6c63ff"),
         }
 
 def _schedule_group(self, class_ids):
