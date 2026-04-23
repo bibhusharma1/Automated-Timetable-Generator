@@ -84,3 +84,24 @@ const LUNCH = '12:00-1:00';
 const LAB_PAIRS = [['8:00-9:00','9:00-10:00'],['9:00-10:00','10:00-11:00'],['1:00-2:00','2:00-3:00'],['2:00-3:00','3:00-4:00']];
 const PRIME = ['8:00-9:00','9:00-10:00','10:00-11:00','11:00-12:00'];
 const AFTERNOON = ['1:00-2:00','2:00-3:00','3:00-4:00'];
+
+/* ── CSV PARSER ─────────────────────────────────────────────────── */
+function parseCSV(raw) {
+  const lines = raw.trim().split('\n').filter(Boolean);
+  if (lines.length < 2) return [];
+  const headers = splitCSVLine(lines[0]);
+  return lines.slice(1).map(line => {
+    const vals = splitCSVLine(line);
+    return Object.fromEntries(headers.map((h,i) => [h.trim(), (vals[i]||'').trim()]));
+  });
+}
+function splitCSVLine(line) {
+  const out = []; let cur = '', inQ = false;
+  for (const ch of line) {
+    if (ch === '"') { inQ = !inQ; }
+    else if (ch === ',' && !inQ) { out.push(cur); cur = ''; }
+    else cur += ch;
+  }
+  out.push(cur);
+  return out.map(v => v.replace(/^"|"$/g,'').trim());
+}
