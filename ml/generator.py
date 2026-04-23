@@ -308,3 +308,14 @@ def _teacher_view(self, grid):
                 "timetable":    tt,
             }
         return out
+def load_and_generate(sp, tp, rp, cp, iterations=60):
+    s = pd.read_csv(sp); t = pd.read_csv(tp)
+    r = pd.read_csv(rp); c = pd.read_csv(cp)
+    gen = TimetableGenerator(s, t, r, c)
+    result, score = gen.generate(iterations=iterations)
+    return result, score, {
+        "subjects": s.to_dict(orient="records"),
+        "teachers": t.to_dict(orient="records"),
+        "rooms":    r.to_dict(orient="records"),
+        "classes":  c.to_dict(orient="records"),
+    }
