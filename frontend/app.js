@@ -113,3 +113,15 @@ function toast(msg, type='ok') {
   document.getElementById('toastContainer').appendChild(el);
   setTimeout(() => el.remove(), 3800);
 }
+/* ── LOADER ─────────────────────────────────────────────────────── */
+let _loaderTimers = [];
+function showLoader() {
+  document.getElementById('loader').classList.add('show');
+  for (let i=0;i<6;i++) document.getElementById(ls${i}).classList.remove('on');
+  _loaderTimers.forEach(clearTimeout);
+  loaderTimers = Array.from({length:6},(,i)=>setTimeout(()=>document.getElementById(ls${i}).classList.add('on'), i*550));
+}
+function hideLoader() {
+  document.getElementById('loader').classList.remove('show');
+  _loaderTimers.forEach(clearTimeout);
+}
