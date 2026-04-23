@@ -257,3 +257,27 @@ def generate(self, iterations=60):
 
         score = round(min(total_placed / max(total_req,1), 1.0) * 100, 1)
         return self._build_output(best_full_grid), score
+def _build_output(self, grid):
+        return {
+            "class":   self._class_view(grid),
+            "teacher": self._teacher_view(grid),
+        }
+
+    def _class_view(self, grid):
+        out = {}
+        for _, cls in self.class_df.iterrows():
+            cid = str(cls["class_id"])
+            if cid not in grid: continue
+            tt = {}
+            for day in DAYS:
+                tt[day] = []
+                for slot in SLOTS:
+                    sess = grid[cid][day][slot]
+                    tt[day].append({"slot": slot, "is_lunch": slot==LUNCH, "session": sess})
+            out[cid] = {
+                "class_name": cls["class_name"],
+                "year":       str(cls.get("year","")),
+                "semester":   str(cls.get("semester","")),
+                "timetable":  tt,
+            }
+        return out
