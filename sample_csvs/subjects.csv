@@ -1,0 +1,73 @@
+subject_id,subject_name,year,semester,credits,hours_per_week,subject_type,requires_lab,lab_hours_per_week
+S101,Mathematics-I,1,1,4,4,theory,false,0
+S102,Physics,1,1,4,4,theory,false,0
+S103,Basic Electrical Engineering,1,1,3,3,theory,false,0
+S104,Engineering Graphics,1,1,3,3,theory,false,0
+S105,Programming in C,1,1,3,3,theory,false,0
+S106,English Communication,1,1,2,2,theory,false,0
+L101,Physics Lab,1,1,2,0,lab,true,2
+L102,Basic Electrical Lab,1,1,2,0,lab,true,2
+L103,C Programming Lab,1,1,2,0,lab,true,2
+S201,Mathematics-II,1,2,4,4,theory,false,0
+S202,Chemistry,1,2,4,4,theory,false,0
+S203,Data Structures,1,2,4,4,theory,false,0
+S204,Digital Electronics,1,2,3,3,theory,false,0
+S205,Object Oriented Programming,1,2,3,3,theory,false,0
+S206,Environmental Science,1,2,2,2,theory,false,0
+L201,Chemistry Lab,1,2,2,0,lab,true,2
+L202,Data Structures Lab,1,2,2,0,lab,true,2
+L203,OOP Lab,1,2,2,0,lab,true,2
+S301,Discrete Mathematics,2,3,4,4,theory,false,0
+S302,Computer Organization,2,3,4,4,theory,false,0
+S303,Operating Systems,2,3,4,4,theory,false,0
+S304,Database Management Systems,2,3,3,3,theory,false,0
+S305,Design and Analysis of Algorithms,2,3,3,3,theory,false,0
+S306,Probability and Statistics,2,3,3,3,theory,false,0
+L301,OS Lab,2,3,2,0,lab,true,2
+L302,DBMS Lab,2,3,2,0,lab,true,2
+L303,Algorithms Lab,2,3,2,0,lab,true,2
+S401,Computer Networks,2,4,4,4,theory,false,0
+S402,Software Engineering,2,4,3,3,theory,false,0
+S403,Theory of Computation,2,4,4,4,theory,false,0
+S404,Microprocessors,2,4,3,3,theory,false,0
+S405,Web Technologies,2,4,3,3,theory,false,0
+S406,Technical Writing,2,4,2,2,theory,false,0
+L401,Networks Lab,2,4,2,0,lab,true,2
+L402,Web Technologies Lab,2,4,2,0,lab,true,2
+L403,Microprocessors Lab,2,4,2,0,lab,true,2
+S501,Machine Learning,3,5,4,4,theory,false,0
+S502,Compiler Design,3,5,4,4,theory,false,0
+S503,Computer Graphics,3,5,3,3,theory,false,0
+S504,Artificial Intelligence,3,5,4,4,theory,false,0
+S505,Mobile Computing,3,5,3,3,theory,false,0
+S506,Cryptography and Network Security,3,5,3,3,theory,false,0
+L501,ML Lab,3,5,2,0,lab,true,2
+L502,Compiler Design Lab,3,5,2,0,lab,true,2
+L503,Computer Graphics Lab,3,5,2,0,lab,true,2
+S601,Deep Learning,3,6,4,4,theory,false,0
+S602,Cloud Computing,3,6,3,3,theory,false,0
+S603,Internet of Things,3,6,3,3,theory,false,0
+S604,Big Data Analytics,3,6,4,4,theory,false,0
+S605,Natural Language Processing,3,6,3,3,theory,false,0
+S606,Professional Ethics,3,6,2,2,theory,false,0
+L601,Deep Learning Lab,3,6,2,0,lab,true,2
+L602,IoT Lab,3,6,2,0,lab,true,2
+L603,Big Data Lab,3,6,2,0,lab,true,2
+S701,Distributed Systems,4,7,4,4,theory,false,0
+S702,Information Security,4,7,3,3,theory,false,0
+S703,Elective-I (Blockchain),4,7,3,3,elective,false,0
+S704,Elective-II (AR/VR),4,7,3,3,elective,false,0
+S705,Project Phase-I,4,7,4,4,theory,false,0
+S706,Seminar,4,7,2,2,theory,false,0
+L701,Distributed Systems Lab,4,7,2,0,lab,true,2
+L702,Security Lab,4,7,2,0,lab,true,2
+L703,Project Lab,4,7,4,0,lab,true,4
+S801,Advanced Algorithms,4,8,3,3,theory,false,0
+S802,Elective-III (Quantum Computing),4,8,3,3,elective,false,0
+S803,Elective-IV (Edge Computing),4,8,3,3,elective,false,0
+S804,Project Phase-II,4,8,6,6,theory,false,0
+S805,Industrial Training,4,8,2,2,theory,false,0
+S806,Comprehensive Viva,4,8,2,2,theory,false,0
+L801,Project Lab-II,4,8,4,0,lab,true,4
+L802,Seminar Lab,4,8,2,0,lab,true,2
+L803,Advanced Lab,4,8,2,0,lab,true,2

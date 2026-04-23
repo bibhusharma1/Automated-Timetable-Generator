@@ -12,6 +12,10 @@ forge-v2/
 │
 ├── 📁 ml/
 │   └── generator.py        ← Scheduling engine (credit-weighted, per-semester)
+│
+├── 📁 sample_csvs/
+│   ├── subjects.csv        ← 74 CSE subjects across 4 years + labs
+│   ├── teachers.csv        ← 64 faculty members with subject assignments
 
 
 
