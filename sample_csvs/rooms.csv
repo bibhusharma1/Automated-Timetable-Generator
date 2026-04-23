@@ -1,0 +1,11 @@
+room_id,room_name,capacity,room_type,building
+R01,Lecture Hall-A,80,classroom,Main Block
+R02,Lecture Hall-B,80,classroom,Main Block
+R03,Lecture Hall-C,60,classroom,Main Block
+R04,Lecture Hall-D,60,classroom,Main Block
+R05,Seminar Hall,40,classroom,Main Block
+R06,CS Lab-1 (Programming),40,lab,CS Block
+R07,CS Lab-2 (Networks),40,lab,CS Block
+R08,CS Lab-3 (Advanced),35,lab,CS Block
+R09,Electronics Lab,35,lab,EE Block
+R10,Project Lab,30,lab,CS Block
