@@ -215,3 +215,14 @@ def _schedule_group(self, class_ids):
                         if placed: break
 
         return grid
+         def _class_score(self, cid, grid):
+        cls  = self.cls_map.get(cid, {})
+        subs = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
+        req  = 0
+        for sid in subs:
+            sub = self.sub_map.get(sid, {})
+            if not sub: continue
+            is_lab = str(sub.get("requires_lab","false")).lower() == "true"
+            req += int(sub.get("lab_hours_per_week",2) if is_lab else sub.get("hours_per_week",3) or 3)
+        placed = sum(1 for d in DAYS for s in SLOTS if grid[cid][d][s])
+        return placed / max(req, 1)
