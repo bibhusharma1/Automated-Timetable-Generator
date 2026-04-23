@@ -309,3 +309,87 @@ textarea:focus { outline: none; border-color: var(--violet); }
 .tstat-hrs  { font-size: 1.4rem; font-weight: 700; color: var(--amber); }
 .tstat-sub  { font-size: 0.7rem; color: var(--muted); }
 
+/* ── TIMETABLE ──────────────────────────────────────────────────── */
+.tt-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+
+.tt {
+  width: 100%; border-collapse: collapse; min-width: 800px;
+  table-layout: fixed;
+}
+
+.tt thead tr th {
+  padding: 12px 8px; font-size: 0.75rem; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px;
+  font-family: 'Fira Code', monospace; background: var(--bg2);
+  border-bottom: 1px solid var(--border); text-align: center;
+}
+.tt thead tr th:first-child { width: 100px; text-align: left; padding-left: 16px; }
+
+.tt tbody tr td {
+  border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  vertical-align: top; padding: 0;
+}
+.tt tbody tr td:first-child {
+  font-family: 'Fira Code', monospace; font-size: 0.7rem;
+  color: var(--muted); padding: 12px 8px 12px 16px;
+  background: var(--bg2); text-align: left;
+  vertical-align: middle; white-space: nowrap;
+}
+.tt tbody tr:last-child td { border-bottom: none; }
+
+/* slot cells */
+.cell {
+  display: block; width: 100%; height: 100%; min-height: 70px;
+  padding: 8px; box-sizing: border-box; position: relative;
+  transition: filter 0.15s;
+}
+.cell:hover { filter: brightness(1.15); cursor: default; }
+
+.cell-free   { background: var(--bg3); }
+.cell-lunch  { background: rgba(255,110,64,0.08); border-top: 2px solid var(--lunch); }
+.cell-theory { background: rgba(61,90,254,0.12); border-top: 3px solid; }
+.cell-lab    { background: rgba(0,191,165,0.12); border-top: 3px solid var(--lab); }
+.cell-lab.continuation { opacity: 0.6; }
+
+.cell-lunch .cell-lunch-text {
+  font-size: 0.72rem; color: var(--lunch); font-family: 'Fira Code', monospace;
+  text-align: center; padding-top: 22px; letter-spacing: 1px;
+}
+
+.cell-tag {
+  font-size: 0.62rem; font-family: 'Fira Code', monospace;
+  font-weight: 600; letter-spacing: 0.5px;
+  padding: 2px 5px; border-radius: 4px; display: inline-block; margin-bottom: 4px;
+}
+.tag-theory { background: rgba(61,90,254,0.25); color: #7b9cff; }
+.tag-lab    { background: rgba(0,191,165,0.25); color: var(--lab); }
+.tag-credit { background: rgba(245,166,35,0.15); color: var(--amber); margin-left: 4px; }
+
+.cell-subj { font-weight: 700; font-size: 0.82rem; line-height: 1.2; margin-bottom: 4px; color: var(--text); }
+.cell-teacher, .cell-class { font-size: 0.7rem; color: var(--muted); margin-bottom: 2px; }
+.cell-room { font-size: 0.65rem; color: var(--violet); font-family: 'Fira Code', monospace; }
+
+/* ── ANALYSIS ───────────────────────────────────────────────────── */
+.analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.an-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 14px; padding: 22px; }
+.an-card.wide { grid-column: 1 / -1; }
+.an-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+.an-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+.conflict-ok  { color: var(--cyan); font-family: 'Fira Code', monospace; font-size: 0.85rem; padding: 12px; background: rgba(6,214,160,0.08); border-radius: 8px; text-align: center; }
+.conflict-item { padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 0.8rem; background: rgba(255,107,138,0.08); border: 1px solid rgba(255,107,138,0.2); color: var(--rose); }
+
+/* bar chart */
+.barchart { display: flex; flex-direction: column; gap: 8px; }
+.bar-row { display: flex; align-items: center; gap: 10px; }
+.bar-lbl { font-size: 0.75rem; color: var(--muted); width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar-bg  { flex: 1; height: 22px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+.bar-val { font-size: 0.72rem; color: var(--amber); font-family: 'Fira Code', monospace; width: 28px; text-align: right; }
+
+/* credit dist */
+.credit-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+.credit-badge { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
+.credit-num { font-size: 1.6rem; font-weight: 700; color: var(--violet); }
+.credit-lbl { font-size: 0.7rem; color: var(--muted); font-family: 'Fira Code', monospace; }
