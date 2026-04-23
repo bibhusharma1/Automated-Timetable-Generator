@@ -403,3 +403,22 @@ function renderResults() {
   buildAnalysis();
   setStep(3,'done'); setStep(4,'active');
 }
+/* ── VIEW SWITCHING ─────────────────────────────────────────────── */
+function switchView(view) {
+  S.currentView = view;
+  document.querySelectorAll('.vsw').forEach(b=>b.classList.remove('active'));
+  document.getElementById(vsw-${view}).classList.add('active');
+  document.querySelectorAll('.view-panel').forEach(p=>p.classList.add('hidden'));
+  document.getElementById(vp-${view}).classList.remove('hidden');
+  if(view==='teacher') renderTeacherStats();
+}
+
+/* ── LEGEND ─────────────────────────────────────────────────────── */
+function buildLegend() {
+  document.getElementById('ttLegend').innerHTML = `
+    <div class="legend-item"><div class="legend-dot" style="background:#3d5afe"></div>Theory</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00bfa5"></div>Lab (2-hr block)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff6e40"></div>Lunch Break</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--bg3)"></div>Free Slot</div>
+    <div class="legend-item">🟡 Credit score shown on each session</div>`;
+}
