@@ -4,8 +4,7 @@
             class timetable, teacher timetable, analysis, export
    ================================================================ */
 
-const API = 'https://timeforge-api.onrender.com/api';
-
+const API = 'https://timeforge-v2-xyz.onrender.com/api';
 /* ── State ─────────────────────────────────────────────────────── */
 const S = {
   csv:          { subjects:'', teachers:'', rooms:'', classes:'' },
