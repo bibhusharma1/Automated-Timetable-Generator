@@ -4,7 +4,7 @@
             class timetable, teacher timetable, analysis, export
    ================================================================ */
 
-const API = 'http://localhost:5000/api';
+const API = 'https://timeforge-api.onrender.com/api';
 
 /* ── State ─────────────────────────────────────────────────────── */
 const S = {
