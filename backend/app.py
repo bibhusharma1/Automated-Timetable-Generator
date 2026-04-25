@@ -16,7 +16,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ml.generator import TimetableGenerator
 
 app      = Flask(__name__)
-CORS(app, origins=["https://timeforge-v2.vercel.app", "http://localhost:5000"])
+CORS(app, origins=["https://timeforge-v2.vercel.app"])
 ROOT     = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SAMPLE   = os.path.join(ROOT, "sample_csvs")
 
