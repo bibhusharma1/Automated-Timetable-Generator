@@ -213,8 +213,43 @@ class TimetableGenerator:
             if not sub: continue
             is_lab = str(sub.get("requires_lab","false")).lower() == "true"
             req += int(sub.get("lab_hours_per_week",2) if is_lab else sub.get("hours_per_week",3) or 3)
-        placed = sum(1 for d in DAYS for s in SLOTS if grid[cid][d][s])
-        return placed / max(req, 1)
+
+        placed       = 0
+        soft_penalty = 0
+
+        for day in DAYS:
+            seen_today     = []
+            day_sess_count = 0
+            for slot in SLOTS:
+                sess = grid[cid][day][slot]
+                if not sess:
+                    continue
+                placed += 1
+                day_sess_count += 1
+                sid = sess.get("subject_id","")
+                # Penalty: same subject twice on same day
+                if sid in seen_today:
+                    soft_penalty += 0.8
+                seen_today.append(sid)
+            # Penalty: more than 5 sessions in one day (overloaded)
+            if day_sess_count > 5:
+                soft_penalty += (day_sess_count - 5) * 0.5
+
+        # Penalty: teacher teaching more than 4 hours in one day
+        teacher_day = {}
+        for day in DAYS:
+            for slot in SLOTS:
+                sess = grid[cid][day][slot]
+                if sess:
+                    key = f"{sess.get('teacher_id','')}_{day}"
+                    teacher_day[key] = teacher_day.get(key, 0) + 1
+        for key, count in teacher_day.items():
+            if count > 4:
+                soft_penalty += (count - 4) * 0.4
+
+        raw_score      = placed / max(req, 1)
+        penalty_factor = min(soft_penalty / max(placed, 1), 0.20)
+        return raw_score * (1 - penalty_factor)
 
     # ─── public ──────────────────────────────────────────────────────────────
     def generate(self, iterations=60):
@@ -237,18 +272,12 @@ class TimetableGenerator:
                 if best_s >= 0.92: break
             best_full_grid.update(best_g)
 
-        # overall score
-        for cid in best_full_grid:
-            cls  = self.cls_map.get(cid, {})
-            subs = [s.strip() for s in str(cls.get("subjects","")).split(",") if s.strip()]
-            for sid in subs:
-                sub = self.sub_map.get(sid, {})
-                if not sub: continue
-                is_lab = str(sub.get("requires_lab","false")).lower() == "true"
-                total_req += int(sub.get("lab_hours_per_week",2) if is_lab else sub.get("hours_per_week",3) or 3)
-            total_placed += sum(1 for d in DAYS for s in SLOTS if best_full_grid[cid][d][s])
-
-        score = round(min(total_placed / max(total_req,1), 1.0) * 100, 1)
+        # overall score — average of per-class scores (includes soft penalties)
+        all_scores = [
+            self._class_score(cid, best_full_grid)
+            for cid in best_full_grid
+        ]
+        score = round((sum(all_scores) / max(len(all_scores), 1)) * 100, 1)
         return self._build_output(best_full_grid), score
 
     # ─── output builders ─────────────────────────────────────────────────────
